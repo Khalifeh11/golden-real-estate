@@ -10,7 +10,7 @@ Rebuilding a real estate website for Golden Land Real Estate. Migrating from Apo
 - **Styling**: Tailwind CSS
 - **Database**: MongoDB Atlas (migrating existing data from ApostropheCMS MongoDB)
 - **ODM**: Mongoose
-- **Auth**: NextAuth.js v5 (credentials + Google OAuth)
+- **Auth**: NextAuth.js v5 (credentials only — admin + agents)
 - **Image Storage**: Cloudflare R2 (S3-compatible, no egress fees)
 - **Hosting**: Vercel + MongoDB Atlas
 - **Key Libraries**: Zod (validation), react-hook-form (forms), Radix UI (accessible primitives), @aws-sdk/client-s3 (R2 uploads), lucide-react (icons), sonner (toasts), Resend (emails)
@@ -27,15 +27,9 @@ Rebuilding a real estate website for Golden Land Real Estate. Migrating from Apo
 | Properties | `/properties` | Public |
 | Property Detail | `/properties/[id]` | Public |
 | Login | `/auth/login` | Public |
-| Register | `/auth/register` | Public |
-| Dashboard | `/dashboard` | User |
-| My Properties | `/dashboard/my-properties` | User |
-| Submit Property | `/dashboard/submit-property` | User |
-| Favorites | `/dashboard/favorites` | User |
-| Admin Overview | `/admin` | Admin |
-| Manage Properties | `/admin/properties` | Admin |
-| Review Submissions | `/admin/properties/pending` | Admin |
-| Add Property | `/admin/properties/new` | Admin |
+| Admin Overview | `/admin` | Admin/Agent |
+| Manage Properties | `/admin/properties` | Admin/Agent |
+| Add Property | `/admin/properties/new` | Admin/Agent |
 | Manage Agents | `/admin/agents` | Admin |
 | Contact Submissions | `/admin/contacts` | Admin |
 | Manage Users | `/admin/users` | Admin |
@@ -47,7 +41,7 @@ Rebuilding a real estate website for Golden Land Real Estate. Migrating from Apo
 ```
 golden-real-estate/
 ├── scripts/
-│   ├── cleanup-data.ts              # Cleanup script: strip CMS internals, fix types, rename fields
+│   ├── migrate-mongo.ts             # Migration: read aposDocs → split into clean collections
 │   └── upload-images.ts             # Batch upload images to R2 (run on cloud VM)
 ├── public/images/
 ├── src/
@@ -63,14 +57,7 @@ golden-real-estate/
 │   │   │   ├── page.tsx             # Listings + search/filter
 │   │   │   └── [id]/page.tsx        # Detail (SSR for SEO)
 │   │   ├── auth/
-│   │   │   ├── login/page.tsx
-│   │   │   └── register/page.tsx
-│   │   ├── dashboard/
-│   │   │   ├── layout.tsx           # Sidebar + auth guard
-│   │   │   ├── page.tsx
-│   │   │   ├── my-properties/page.tsx
-│   │   │   ├── submit-property/page.tsx
-│   │   │   └── favorites/page.tsx
+│   │   │   └── login/page.tsx
 │   │   ├── admin/
 │   │   │   ├── layout.tsx           # Admin sidebar + admin auth guard
 │   │   │   ├── page.tsx             # Overview/stats
@@ -88,7 +75,6 @@ golden-real-estate/
 │   │       ├── auth/[...nextauth]/route.ts
 │   │       ├── properties/route.ts         # GET (search), POST (create)
 │   │       ├── properties/[id]/route.ts    # GET, PUT, DELETE
-│   │       ├── properties/favorites/route.ts
 │   │       ├── agents/route.ts
 │   │       ├── contact/route.ts
 │   │       ├── upload/route.ts
@@ -100,11 +86,11 @@ golden-real-estate/
 │   │           └── users/[id]/role/route.ts
 │   ├── components/
 │   │   ├── ui/         # Button, Input, Select, Slider, Modal, Card, Badge, Skeleton, Pagination, ImageGallery
-│   │   ├── layout/     # Navbar, Footer, MobileMenu, DashboardSidebar
+│   │   ├── layout/     # Navbar, Footer, MobileMenu
 │   │   ├── property/   # PropertyCard, PropertyGrid, PropertySearchBar, PropertyFilters, PropertyDetail, PropertyForm, PropertyImageUpload
 │   │   ├── home/       # HeroSection, FeaturedProperties, StatsSection
 │   │   ├── agent/      # AgentCard, ContactAgentForm
-│   │   ├── auth/       # LoginForm, RegisterForm, AuthGuard
+│   │   ├── auth/       # LoginForm, AuthGuard
 │   │   └── admin/      # AdminSidebar, StatsCard, PropertyTable, AgentForm, ContactTable, UserTable
 │   ├── lib/
 │   │   ├── mongodb.ts       # Mongoose connection singleton
@@ -117,11 +103,9 @@ golden-real-estate/
 │   │   ├── Property.ts      # Mongoose schema + model
 │   │   ├── Agent.ts         # Mongoose schema + model
 │   │   ├── User.ts          # Mongoose schema + model
-│   │   ├── Favorite.ts      # Mongoose schema + model
 │   │   └── ContactRequest.ts # Mongoose schema + model
 │   ├── hooks/
 │   │   ├── usePropertySearch.ts  # URL-synced search state
-│   │   ├── useFavorites.ts
 │   │   └── useDebounce.ts
 │   └── types/index.ts
 ```
@@ -133,11 +117,12 @@ golden-real-estate/
 ### Property
 ```ts
 {
+  _id: String,                // CUID from old data
   title: String,              // required
   slug: String,               // required, unique
   referenceNumber: String,    // unique, sparse (old `reference` or auto-generated "GL-XXXXX")
   description: String,        // extracted HTML from ApostropheCMS area blocks
-  price: Number,              // converted from string
+  price: Number,              // native integer in MongoDB ($numberInt)
   currency: String,           // default "USD"
   category: String,           // "FOR_SALE" | "FOR_RENT" — derived from old `status`
   propertyGroup: String,      // "RESIDENTIAL" | "COMMERCIAL" | "LAND" — auto-classified from title
@@ -152,19 +137,25 @@ golden-real-estate/
   bathrooms: Number,          // only present for residential (old `numberOfBathrooms`)
   parkings: Number,           // optional (old `numberOfParkings`)
   areaSqm: Number,            // converted from string (old `space`)
-  yearBuilt: Number,          // optional
+  yearBuilt: Number,          // optional (old `builtIn`)
   furnished: Boolean,         // optional
   waterfront: Boolean,        // optional
   view: String,               // optional
   features: [String],         // flexible array
-  images: [{                  // replaces ApostropheCMS area structure
+  imageRefs: [{               // temporary — replaced by `images` after R2 upload
+    attachmentId: String,     // aposAttachments _id
+    filename: String,         // resolved filename from aposAttachments
+    extension: String,        // jpg, png, gif
+    isThumbnail: Boolean,     // true for the cover image
+    order: Number
+  }],
+  images: [{                  // final — populated after R2 upload (Phase 5)
     url: String,              // R2 URL
     thumbnailUrl: String,     // R2 thumbnail URL
     altText: String,
     order: Number
   }],
-  agentId: ObjectId,          // ref → Agent
-  userId: ObjectId,           // ref → User (for user-submitted properties)
+  agentId: String,            // ref → Agent (CUID string, not ObjectId)
   commission: Number,         // optional, percentage
   isFeatured: Boolean,        // default false
   views: Number,              // default 0
@@ -178,6 +169,7 @@ Documents only contain the fields they have — a land listing won't have `bedro
 ### Agent
 ```ts
 {
+  _id: String,                // CUID from old data
   firstName: String,
   lastName: String,
   email: String,
@@ -192,34 +184,23 @@ Documents only contain the fields they have — a land listing won't have `bedro
 ### User
 ```ts
 {
-  name: String,
-  email: String,              // unique
-  passwordHash: String,
-  image: String,              // Google OAuth avatar
-  role: String,               // "USER" | "AGENT" | "ADMIN", default "USER"
-  phone: String,
-  // NextAuth fields:
-  emailVerified: Date,
-  accounts: [{ provider, providerAccountId, ... }]
+  name: String,               // required
+  email: String,              // required, unique
+  passwordHash: String,       // required, bcrypt
+  role: String,               // "ADMIN" | "AGENT", default "AGENT"
+  createdAt: Date,
+  updatedAt: Date
 }
 ```
-
-### Favorite
-```ts
-{
-  userId: ObjectId,           // ref → User
-  propertyId: ObjectId,       // ref → Property
-  createdAt: Date
-}
-// Compound unique index on { userId, propertyId }
-```
+No registration — admin creates accounts manually. Only admin + agents can log in.
 
 ### ContactRequest
 ```ts
 {
-  propertyId: ObjectId,       // ref → Property (optional — general inquiries)
-  propertySlug: String,       // preserved from old data (old contact forms reference by slug)
-  name: String,
+  _id: String,                // CUID from old data
+  subject: String,            // from old `title` field
+  propertySlug: String,       // old `property` field with "/properties/" prefix stripped
+  name: String,               // concatenated from old `firstName` + `lastName`
   email: String,
   phone: String,
   message: String,
@@ -238,25 +219,29 @@ Property: { price: 1 }
 Property: { areaSqm: 1 }
 Property: { agentId: 1 }
 Property: { title: "text", description: "text" }   // text search
-Favorite: { userId: 1, propertyId: 1 } unique
 ContactRequest: { createdAt: -1 }
 User: { email: 1 } unique
 ```
 
 ---
 
-## Data Cleanup Strategy
+## Data Migration (MongoDB → MongoDB)
 
-### What Changed (vs old PostgreSQL plan)
-Instead of a full ETL migration to a new database, we clean up the existing MongoDB data in-place. The data stays in MongoDB — we just strip ApostropheCMS cruft and reshape documents.
+### What This Does
+Reads from `aposDocs` (single mixed collection where ApostropheCMS stored everything) and writes to new separate collections in the same database. This is a migration, not an in-place cleanup.
 
-### Cleanup Script (`scripts/cleanup-data.ts`)
+### Migration Script (`scripts/migrate-mongo.ts`)
 
-Runs directly against the MongoDB database. Operations:
+Reads from `aposDocs`, transforms, and inserts into new collections. Operations:
 
-1. **Strip ApostropheCMS internal fields** from all property documents:
-   - Remove: `type`, `titleSortified`, `highSearchText`, `lowSearchText`, `highSearchWords`, `searchSummary`, `historicUrls`, `advisoryLock`, `docPermissions`, `viewGroupsIds`, `editGroupsIds`, `viewUsersIds`, `editUsersIds`, `tags` (always empty)
-   - Remove redundant: `agent` (duplicate of `agentId`), `area` (duplicate of `space`)
+**Agent migration** (`type:"agent"` → `agents` collection):
+1. Strip ApostropheCMS internal fields: `type`, `titleSortified`, `highSearchText`, `lowSearchText`, `highSearchWords`, `searchSummary`, `historicUrls`, `advisoryLock`, `docPermissions`, `viewGroupsIds`, `editGroupsIds`, `viewUsersIds`, `editUsersIds`, `tags`
+2. Keep profile fields (`firstName`, `lastName`, `email`, `phone`, `bio`)
+3. Preserve CUID `_id`
+
+**Property migration** (`type:"property"` → `properties` collection):
+1. **Strip ApostropheCMS internal fields** (same list as agents)
+   - Also remove redundant: `agent` (duplicate of `agentId`), `area` (duplicate of `space`)
 
 2. **Rename fields:**
    - `numberOfRooms` → `bedrooms`
@@ -266,43 +251,60 @@ Runs directly against the MongoDB database. Operations:
    - `mapLatitude` → `latitude`
    - `mapLongitude` → `longitude`
    - `reference` → `referenceNumber`
+   - `builtIn` → `yearBuilt`
 
 3. **Convert types** (strings → numbers):
-   - `price`: string → Number
    - `bedrooms`, `bathrooms`, `parkings`: string → Number
    - `areaSqm`: string → Number
    - `latitude`, `longitude`: string → Number
    - `commission`: string → Number
+   - Note: `price` is already a native integer in MongoDB (`$numberInt`) — no conversion needed
 
-4. **Derive new fields from old `status`:**
+4. **Derive `category` + `status` from old `status` field:**
    - `forSale` → `category: "FOR_SALE"`, `status: "ACTIVE"`
    - `forRent` → `category: "FOR_RENT"`, `status: "ACTIVE"`
    - `sold` → `category: "FOR_SALE"`, `status: "SOLD"`
    - `underOffer` → `category: "FOR_SALE"`, `status: "UNDER_OFFER"`
    - null/missing → `category: null`, `status: "INACTIVE"`
    - `trash: true` → `status: "INACTIVE"` (regardless of old status)
+   - Remove `published` and `trash` fields after deriving status
 
-5. **Normalize country names:** lowercase → title case (`"lebanon"` → `"Lebanon"`, `"greece"` → `"Greece"`)
+5. **Explicitly drop low-coverage fields:**
+   - `garden`, `terrace` — redundant with features array, low coverage. Logged and dropped, not silently lost.
 
-6. **Auto-classify property type from title** (same logic as before):
+6. **Normalize country names:** lowercase → title case (`"lebanon"` → `"Lebanon"`, `"greece"` → `"Greece"`)
+
+7. **Auto-classify property type from title:**
    - Parse title for keywords → set `propertyGroup` + `propertyType`
 
-7. **Extract description HTML** from ApostropheCMS area structure:
+8. **Extract description HTML** from ApostropheCMS area structure:
    - `description[].content` (where `type === "apostrophe-rich-text"`) → concatenate into single HTML string
 
-8. **Add defaults:**
-   - `isFeatured: false`, `views: 0`, `currency: "USD"`
+9. **Resolve image references → `imageRefs` array:**
+   - For each property, resolve `thumbnail` pieceId → `apostrophe-image` doc → `aposAttachments` doc. This becomes the first `imageRefs` entry with `isThumbnail: true`.
+   - Resolve remaining image pieceIds from the gallery area the same way.
+   - Store as `imageRefs` array (intermediate — replaced by `images` after R2 upload in Phase 5).
 
-9. **Clean up agent documents** similarly (strip CMS internals, keep profile fields)
+10. **Add defaults:**
+    - `isFeatured: false`, `views: 0`, `currency: "USD"`
 
-10. **Clean up contact-form documents** (rename to match ContactRequest schema)
+11. **Feature string cleanup:** deferred to a separate manual pass. Near-duplicates and typos in the `features` array are acknowledged but not blocking.
 
-### Cleanup Order
-1. Agents (strip CMS fields, reshape)
-2. Properties (full cleanup as above)
-3. Contact forms (reshape)
-4. Drop unused collections/document types (`apostrophe-image`, `apostrophe-user`, `apostrophe-group`, `apostrophe-global`, page documents)
-5. Create indexes
+**ContactRequest migration** (`type:"contact-form"` → `contactRequests` collection):
+1. `title` → `subject`
+2. Concatenate `firstName` + `lastName` → `name`
+3. Strip `"/properties/"` prefix from `property` → `propertySlug`
+4. Keep `email`, `phone`, `message`
+5. Add defaults: `isRead: false`, `isResponded: false`
+6. Preserve CUID `_id`
+
+### Migration Order
+1. Agents → `agents` collection
+2. Properties → `properties` collection (includes image reference resolution)
+3. Contact forms → `contactRequests` collection
+4. Drop `aposDocs` collection
+5. Keep `aposAttachments` until image upload script runs (Phase 5), then drop it
+6. Create indexes on new collections
 
 ---
 
@@ -346,11 +348,10 @@ Download all 6 tar files locally. Don't extract, just save. This is your backup.
 | Method | Route | Description |
 |--------|-------|-------------|
 | GET | `/api/properties` | Search/filter/paginate. Params: q, category, propertyGroup, propertyType, country, city, minPrice, maxPrice, minArea, maxArea, bedrooms, bathrooms, ref, sort, page, limit |
-| POST | `/api/properties` | Create listing (auth required, status=PENDING) |
+| POST | `/api/properties` | Create listing (admin/agent auth required) |
 | GET | `/api/properties/[id]` | Single property (increments views) |
-| PUT | `/api/properties/[id]` | Update (owner/admin) |
-| DELETE | `/api/properties/[id]` | Delete (owner/admin) |
-| GET/POST/DELETE | `/api/properties/favorites` | Manage user favorites |
+| PUT | `/api/properties/[id]` | Update (admin/agent) |
+| DELETE | `/api/properties/[id]` | Delete (admin only) |
 | GET | `/api/agents` | List agents |
 | GET | `/api/agents/[id]` | Agent profile + their listings |
 | POST | `/api/contact` | Submit inquiry |
@@ -360,7 +361,8 @@ Download all 6 tar files locally. Don't extract, just save. This is your backup.
 | PATCH | `/api/properties/[id]/status` | Change property status (approve/reject/feature) |
 | GET | `/api/admin/contacts` | List all contact submissions with read status |
 | PATCH | `/api/admin/contacts/[id]` | Mark contact as read/responded |
-| PATCH | `/api/admin/users/[id]/role` | Change user role |
+| POST | `/api/admin/users` | Create new user (admin only) |
+| PATCH | `/api/admin/users/[id]/role` | Change user role (admin only) |
 
 ---
 
@@ -379,20 +381,21 @@ Download all 6 tar files locally. Don't extract, just save. This is your backup.
 
 ## Implementation Phases
 
-### Phase 1: Foundation + Data Cleanup
+### Phase 1: Foundation + Data Migration
 - Init Next.js + Tailwind + TypeScript
-- Set up MongoDB Atlas cluster, import existing data
+- Set up MongoDB Atlas cluster, import `aposDocs` dump
 - Install Mongoose, create connection singleton (`lib/mongodb.ts`)
 - Define Mongoose models (`models/`)
-- Build and run `scripts/cleanup-data.ts` against MongoDB
-- Verify cleaned data (counts, field types, no CMS cruft)
-- Create indexes
+- Build and run `scripts/migrate-mongo.ts` to split `aposDocs` into clean `agents`, `properties`, `contactRequests` collections
+- Verify migrated data (counts, field types, no CMS cruft, image refs resolved)
+- Create indexes on new collections
 - Set up Cloudflare R2 bucket
-- Set up NextAuth (credentials + Google)
+- Set up NextAuth (credentials only — admin + agents)
 - Build Navbar (responsive + mobile menu) + Footer
 - Home page (static hero placeholder)
 - About page
-- Login + Register pages with working auth
+- Login page with working auth
+- Seed script to create initial admin user
 - Set up lib/ utilities (mongodb.ts, auth.ts, r2.ts, constants.ts, validators.ts)
 
 ### Phase 2: Properties Core
@@ -404,38 +407,30 @@ Download all 6 tar files locally. Don't extract, just save. This is your backup.
 - ImageGallery with lightbox
 - Build UI primitives: Slider, Select, Badge, Skeleton
 
-### Phase 3: User Dashboard & Submissions
+### Phase 3: Admin Panel
+- Admin layout with sidebar + AuthGuard (checks role === "ADMIN" or "AGENT")
+- Admin overview page — stats cards (total properties, agents, recent inquiries)
+- `GET /api/admin/stats` — dashboard stats endpoint (MongoDB aggregation)
 - Image upload to R2
 - POST/PUT/DELETE property API routes with Zod validation
-- Dashboard layout + sidebar
-- Submit Property form (multi-section, fields shown based on propertyGroup)
-- My Properties page (edit/delete)
-- Auto-generate referenceNumber for new properties ("GL-XXXXX")
-- AuthGuard for protected routes
-
-### Phase 4: Admin Dashboard
-- Admin layout with sidebar + AdminGuard (checks role === "ADMIN")
-- Admin overview page — stats cards (total properties, agents, users, recent inquiries)
-- `GET /api/admin/stats` — dashboard stats endpoint (MongoDB aggregation)
 - Property management page — view/edit/delete all properties, toggle featured
+- Add Property form (multi-section, fields shown based on propertyGroup)
 - `PATCH /api/properties/[id]/status` — change property status (approve/reject/feature)
-- Submission review page — approve or reject PENDING user-submitted listings
-- Agent management page — add/edit/remove agent profiles, upload photos
-- Contact submissions page — view all inquiries, mark as read/responded
+- Auto-generate referenceNumber for new properties ("GL-XXXXX")
+- Agent management page — add/edit/remove agent profiles, upload photos (admin only)
+- Contact submissions page — view all inquiries, mark as read/responded (admin only)
 - `GET /api/admin/contacts` + `PATCH /api/admin/contacts/[id]`
-- User management page — view users, change roles (User/Agent/Admin)
-- `PATCH /api/admin/users/[id]/role`
+- User management page — create users, change roles (admin only)
+- `POST /api/admin/users` + `PATCH /api/admin/users/[id]/role`
 - All admin API routes check session role before processing
 
-### Phase 5: Favorites, Contact, Agents + Image Migration
-- Favorites API + FavoriteButton + useFavorites hook
-- Favorites dashboard page
-- Contact form + email via Resend
+### Phase 4: Contact, Agents + Image Migration
+- Contact form (public) + email via Resend
 - Agents listing page
 - Agent profile page (bio + listings)
 - **Run image migration** (cloud VM → R2 → update property docs)
 
-### Phase 6: Polish & Deploy
+### Phase 5: Polish & Deploy
 - SEO: generateMetadata, sitemap.xml, robots.txt, JSON-LD
 - next/image optimization with custom R2 loader
 - Loading skeletons + Suspense boundaries
