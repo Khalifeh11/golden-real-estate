@@ -15,7 +15,7 @@ export interface IImage {
   order: number;
 }
 
-export interface IProperty extends Document {
+export interface IProperty extends Document<string> {
   _id: string;
   title: string;
   slug: string;

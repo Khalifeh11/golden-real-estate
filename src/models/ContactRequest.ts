@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface IContactRequest extends Document {
+export interface IContactRequest extends Document<string> {
   _id: string;
   subject?: string;
   propertySlug?: string;

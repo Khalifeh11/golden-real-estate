@@ -1,26 +1,108 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens from Stitch — "The Curated Horizon"
+ * Gold + Linen + Steel palette, editorial aesthetic
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primary — Warm Brushed Gold */
+  --primary: #755b00;
+  --primary-container: #c9a84c;
+  --on-primary: #ffffff;
+  --on-primary-container: #503d00;
+
+  /* Secondary — Charcoal Steel */
+  --secondary: #4e6071;
+  --secondary-container: #cfe2f6;
+  --on-secondary: #ffffff;
+  --on-secondary-container: #526575;
+
+  /* Tertiary — Maritime Cyan */
+  --tertiary: #00687b;
+  --tertiary-container: #10bbdc;
+  --on-tertiary: #ffffff;
+  --on-tertiary-container: #004654;
+
+  /* Surfaces — Soft Linen hierarchy */
+  --surface: #fafaf5;
+  --surface-dim: #dadad5;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f4f4ef;
+  --surface-container: #eeeee9;
+  --surface-container-high: #e8e8e3;
+  --surface-container-highest: #e3e3de;
+
+  /* Text */
+  --on-surface: #1a1c19;
+  --on-surface-variant: #4d4637;
+
+  /* Outlines */
+  --outline: #7e7665;
+  --outline-variant: #d0c5b2;
+
+  /* Error */
+  --error: #ba1a1a;
+  --error-container: #ffdad6;
+  --on-error: #ffffff;
+
+  /* Inverse */
+  --inverse-surface: #2f312e;
+  --inverse-on-surface: #f1f1ec;
+  --inverse-primary: #e6c364;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-body: var(--font-inter);
+  --font-display: var(--font-manrope);
+
+  --color-primary: var(--primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary: var(--on-primary);
+  --color-on-primary-container: var(--on-primary-container);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary: var(--on-secondary);
+  --color-on-secondary-container: var(--on-secondary-container);
+
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+
+  --color-error: var(--error);
+  --color-error-container: var(--error-container);
+  --color-on-error: var(--on-error);
+
+  --color-inverse-surface: var(--inverse-surface);
+  --color-inverse-on-surface: var(--inverse-on-surface);
+  --color-inverse-primary: var(--inverse-primary);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Material Symbols icon sizing */
+.material-symbols-outlined {
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--surface);
+  color: var(--on-surface);
 }
