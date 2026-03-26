@@ -104,6 +104,23 @@ export type PropertyCardData = Pick<
   image: string;
 };
 
+/** Extended card data for the listing page — adds location, parkings, and features */
+export type PropertyListingCardData = PropertyCardData & {
+  city?: string;
+  district?: string;
+  parkings?: number;
+  features: string[];
+};
+
+/** Dynamic filter options returned from DB (or mock data) */
+export interface FilterOptions {
+  countries: string[];
+  cities: string[];
+  districts: string[];
+  propertyTypes: string[];
+  features: string[];
+}
+
 // API response types
 export interface PaginatedResponse<T> {
   data: T[];

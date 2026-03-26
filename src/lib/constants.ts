@@ -56,8 +56,26 @@ export const CURRENCIES = ["USD", "EUR"] as const;
 
 // Search/filter defaults
 export const DEFAULT_PAGE_SIZE = 24;
-export const MAX_PRICE = 10_000_000;
-export const MAX_AREA = 10_000;
+
+// Slider ranges per category — derived from real listing data
+export const SLIDER_CONFIG = {
+  FOR_SALE: {
+    price: { min: 0, max: 1_500_000, step: 10_000 },
+    area: { min: 0, max: 1_000, step: 10 },
+  },
+  FOR_RENT: {
+    price: { min: 0, max: 5_000, step: 50 },
+    area: { min: 0, max: 500, step: 5 },
+  },
+} as const;
+
+export const DEFAULT_SLIDER_CONFIG = SLIDER_CONFIG.FOR_SALE;
+
+export function getSliderConfig(category: string | null) {
+  if (category === "FOR_RENT") return SLIDER_CONFIG.FOR_RENT;
+  if (category === "FOR_SALE") return SLIDER_CONFIG.FOR_SALE;
+  return DEFAULT_SLIDER_CONFIG;
+}
 
 export const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },

@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import type { Property, PropertyCardData } from "@/types";
+import type { Property, PropertyCardData, PropertyListingCardData } from "@/types";
 
 /** Tailwind class merge — combines clsx + tailwind-merge */
 export function cn(...inputs: ClassValue[]) {
@@ -47,7 +47,7 @@ export function categoryLabel(category: string): string {
 
 /** Map a full Property (DB shape) to the minimal data a PropertyCard needs */
 export function toPropertyCardData(property: Property): PropertyCardData {
-  const primaryImage = [...property.images]
+  const primaryImage = [...(property.images ?? [])]
     .sort((a, b) => a.order - b.order)[0];
   return {
     slug: property.slug,
@@ -60,5 +60,26 @@ export function toPropertyCardData(property: Property): PropertyCardData {
     bathrooms: property.bathrooms,
     referenceNumber: property.referenceNumber,
     image: primaryImage?.url ?? "/placeholder-property.svg",
+  };
+}
+
+/** Map a full Property to the extended data a PropertyListingCard needs */
+export function toPropertyListingCardData(property: Property): PropertyListingCardData {
+  const sorted = [...(property.images ?? [])].sort((a, b) => a.order - b.order);
+  return {
+    slug: property.slug,
+    title: property.title,
+    price: property.price,
+    currency: property.currency,
+    category: property.category,
+    areaSqm: property.areaSqm,
+    bedrooms: property.bedrooms,
+    bathrooms: property.bathrooms,
+    referenceNumber: property.referenceNumber,
+    image: sorted[0]?.url ?? "/placeholder-property.svg",
+    city: property.city,
+    district: property.district,
+    parkings: property.parkings,
+    features: property.features ?? [],
   };
 }
