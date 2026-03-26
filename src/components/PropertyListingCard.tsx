@@ -17,7 +17,7 @@ export default function PropertyListingCard({ property }: PropertyListingCardPro
     : null;
 
   // Location string: "District, City" or just "City"
-  const location = [property.district, property.city].filter(Boolean).join(", ");
+  const location = [property.district, property.city, property.country].filter(Boolean).join(", ");
 
   return (
     <Link href={`/properties/${property.slug}`} className="group flex flex-col bg-white rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-secondary/5 border border-transparent hover:border-outline-variant/10">

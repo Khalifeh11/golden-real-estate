@@ -106,6 +106,7 @@ export type PropertyCardData = Pick<
 
 /** Extended card data for the listing page — adds location, parkings, and features */
 export type PropertyListingCardData = PropertyCardData & {
+  country?: string;
   city?: string;
   district?: string;
   parkings?: number;

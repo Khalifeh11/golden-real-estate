@@ -77,6 +77,7 @@ export function toPropertyListingCardData(property: Property): PropertyListingCa
     bathrooms: property.bathrooms,
     referenceNumber: property.referenceNumber,
     image: sorted[0]?.url ?? "/placeholder-property.svg",
+    country: property.country,
     city: property.city,
     district: property.district,
     parkings: property.parkings,
