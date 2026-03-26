@@ -4,9 +4,11 @@ import { CATEGORIES, COUNTRIES } from "@/lib/constants";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import PropertyCard from "@/components/PropertyCard";
+import type { PropertyCardData } from "@/types";
 
 // Placeholder featured properties — will be replaced with DB query
-const FEATURED_PROPERTIES = [
+const FEATURED_PROPERTIES: PropertyCardData[] = [
   {
     slug: "ocean-view-estate",
     title: "Ocean View Estate",
@@ -86,19 +88,6 @@ const FEATURED_PROPERTIES = [
       "https://lh3.googleusercontent.com/aida-public/AB6AXuA_u7257JlmMUFGeTGMWY8pF429MskPB_k2NhqgVVG6sdmwBr0LN1K0cpEP-9ylnaIuX14u8M1RVjaVC196Y4_I8sywl6o2daOBtc8elOwW3ZCgTfqjkTVaPp_gSTLD9exqwrO1HIOq6-aHA7oGzwZruRvpWHXACqBKFGAdhDtb6XOxtB7gjx2uNNKoFc6fcKjMenofxQQxUOBNkGWg1xTFH1SnNNaZQPqipxQ0-93meLR_Po51QT9NtkDQ-oc3QpeAcUBBJu0KXMa3",
   },
 ];
-
-function formatPrice(price: number, currency: string, category: string) {
-  const formatted = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
-  return category === "FOR_RENT" ? `${formatted} / mo` : formatted;
-}
-
-function categoryLabel(category: string) {
-  return CATEGORIES.find((c) => c.value === category)?.label ?? category;
-}
 
 export default function Home() {
   return (
@@ -203,69 +192,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {FEATURED_PROPERTIES.map((property) => (
-              <Link
-                key={property.slug}
-                href={`/properties/${property.slug}`}
-                className="group"
-              >
-                <div className="relative overflow-hidden rounded-xl mb-6 aspect-[4/3]">
-                  <Image
-                    src={property.image}
-                    alt={property.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase shadow-sm ${
-                        property.category === "FOR_RENT"
-                          ? "bg-secondary-container text-on-secondary-container"
-                          : "bg-primary-container text-on-primary-container"
-                      }`}
-                    >
-                      {categoryLabel(property.category)}
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-start">
-                    <h3 className="font-display text-2xl font-bold text-on-surface">
-                      {property.title}
-                    </h3>
-                    <p className="text-secondary font-bold text-xl">
-                      {formatPrice(
-                        property.price,
-                        property.currency,
-                        property.category
-                      )}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-6 text-on-secondary-container text-sm">
-                    <span className="flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-lg">
-                        square_foot
-                      </span>
-                      {property.areaSqm} sqm
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-lg">
-                        bed
-                      </span>
-                      {property.bedrooms}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-lg">
-                        bathtub
-                      </span>
-                      {property.bathrooms}
-                    </span>
-                  </div>
-                  <p className="text-outline text-xs tracking-wider">
-                    REF: #{property.referenceNumber}
-                  </p>
-                </div>
-              </Link>
+              <PropertyCard key={property.slug} property={property} />
             ))}
           </div>
 

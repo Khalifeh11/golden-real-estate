@@ -95,6 +95,15 @@ export interface ContactRequest {
   createdAt: string;
 }
 
+/** Minimum data needed to render a property card */
+export type PropertyCardData = Pick<
+  Property,
+  "slug" | "title" | "price" | "currency" | "category" | "areaSqm" | "bedrooms" | "bathrooms" | "referenceNumber"
+> & {
+  /** Primary display image URL (resolved from images array or provided directly) */
+  image: string;
+};
+
 // API response types
 export interface PaginatedResponse<T> {
   data: T[];
