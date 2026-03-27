@@ -69,6 +69,7 @@ export interface Agent {
   phone?: string;
   bio?: string;
   photoUrl?: string;
+  trash: boolean;
   createdAt: string;
   updatedAt: string;
 }

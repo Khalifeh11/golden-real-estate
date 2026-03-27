@@ -10,8 +10,6 @@ export type InquiryFormState = {
   errors?: Record<string, string[]>;
 };
 
-const USE_MOCK = !process.env.MONGODB_URI;
-
 export async function submitInquiry(
   _prevState: InquiryFormState,
   formData: FormData,
@@ -33,10 +31,6 @@ export async function submitInquiry(
       message: "Please fix the errors below.",
       errors: result.error.flatten().fieldErrors as Record<string, string[]>,
     };
-  }
-
-  if (USE_MOCK) {
-    return { success: true, message: "Your inquiry has been submitted successfully. We will get back to you shortly." };
   }
 
   await dbConnect();
