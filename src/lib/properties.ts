@@ -1,11 +1,15 @@
+import { cache } from "react";
 import dbConnect from "./mongodb";
 import PropertyModel from "@/models/Property";
+import AgentModel from "@/models/Agent";
 import { propertySearchSchema } from "./validators";
-import { toPropertyListingCardData } from "./utils";
+import { toPropertyCardData, toPropertyListingCardData } from "./utils";
 import type {
   Property,
+  Agent,
   PaginatedResponse,
   PropertyListingCardData,
+  PropertyCardData,
   FilterOptions,
 } from "@/types";
 
@@ -460,4 +464,98 @@ export async function getFilterOptions(context?: {
   ]);
 
   return { countries, cities, districts, propertyTypes, features: [] };
+}
+
+// ---------------------------------------------------------------------------
+// Property detail helpers
+// ---------------------------------------------------------------------------
+
+const MOCK_AGENT: Agent = {
+  _id: "mock-agent-1",
+  firstName: "Samer",
+  lastName: "El Khoury",
+  email: "samer@goldenland.com",
+  phone: "+9611234567",
+  bio: "Specializing in luxury developments across Beirut. With over 15 years of experience, Samer ensures a seamless acquisition process.",
+  photoUrl: undefined,
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-01T00:00:00Z",
+};
+
+async function _getPropertyBySlug(slug: string): Promise<Property | null> {
+  if (USE_MOCK) {
+    return MOCK_PROPERTIES.find((p) => p.slug === slug && p.status === "ACTIVE") ?? null;
+  }
+
+  await dbConnect();
+  const doc = await PropertyModel.findOne({ slug, status: "ACTIVE" }).lean();
+  return (doc as unknown as Property) ?? null;
+}
+
+/** Request-level cached version — safe to call from generateMetadata + page */
+export const getPropertyBySlug = cache(_getPropertyBySlug);
+
+export async function getAgentById(agentId: string): Promise<Agent | null> {
+  if (USE_MOCK) return MOCK_AGENT;
+
+  await dbConnect();
+  const doc = await AgentModel.findById(agentId).lean();
+  return (doc as unknown as Agent) ?? null;
+}
+
+export async function getSimilarProperties(
+  property: Property,
+  limit: number = 3,
+): Promise<PropertyCardData[]> {
+  if (USE_MOCK) {
+    const active = MOCK_PROPERTIES.filter(
+      (p) => p._id !== property._id && p.status === "ACTIVE",
+    );
+    // Same district + category first
+    let similar = active.filter(
+      (p) => p.district === property.district && p.category === property.category,
+    );
+    // Fallback to same city + category
+    if (similar.length < limit) {
+      const ids = new Set([property._id, ...similar.map((p) => p._id)]);
+      const cityMatches = active.filter(
+        (p) => !ids.has(p._id) && p.city === property.city && p.category === property.category,
+      );
+      similar = [...similar, ...cityMatches];
+    }
+    return similar.slice(0, limit).map(toPropertyCardData);
+  }
+
+  await dbConnect();
+
+  const baseFilter = { status: "ACTIVE", _id: { $ne: property._id } };
+  const results: Property[] = [];
+
+  // Step 1: same district + category
+  if (property.district && property.category) {
+    const docs = await PropertyModel.find({
+      ...baseFilter,
+      district: property.district,
+      category: property.category,
+    })
+      .limit(limit)
+      .lean();
+    results.push(...(docs as unknown as Property[]));
+  }
+
+  // Step 2: fallback to same city + category
+  if (results.length < limit && property.city && property.category) {
+    const excludeIds = [property._id, ...results.map((p) => p._id)];
+    const docs = await PropertyModel.find({
+      ...baseFilter,
+      _id: { $nin: excludeIds },
+      city: property.city,
+      category: property.category,
+    })
+      .limit(limit - results.length)
+      .lean();
+    results.push(...(docs as unknown as Property[]));
+  }
+
+  return results.slice(0, limit).map(toPropertyCardData);
 }

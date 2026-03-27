@@ -63,6 +63,35 @@ export function toPropertyCardData(property: Property): PropertyCardData {
   };
 }
 
+/** Map a feature string to a Material Symbols icon name */
+const FEATURE_ICONS: Record<string, string> = {
+  "Pool": "pool",
+  "Swimming Pool": "pool",
+  "Infinity Swimming Pool": "pool",
+  "Garden": "deck",
+  "Terrace": "deck",
+  "Private Garden Terrace": "deck",
+  "Parking": "garage",
+  "24/7 Secure Parking": "garage",
+  "Gym": "fitness_center",
+  "Private Gym": "fitness_center",
+  "Security": "security",
+  "Concierge": "security",
+  "Concierge & Security": "security",
+  "Furnished": "chair",
+  "Sea View": "waves",
+  "Central Cooling & Heating": "hvac",
+  "Smart Home": "smart_toy",
+  "Storage": "warehouse",
+  "Balcony": "balcony",
+  "Beach Front": "beach_access",
+  "Historic": "account_balance",
+};
+
+export function featureIcon(feature: string): string {
+  return FEATURE_ICONS[feature] ?? "check_circle";
+}
+
 /** Map a full Property to the extended data a PropertyListingCard needs */
 export function toPropertyListingCardData(property: Property): PropertyListingCardData {
   const sorted = [...(property.images ?? [])].sort((a, b) => a.order - b.order);
