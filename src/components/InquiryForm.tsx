@@ -4,8 +4,11 @@ import { useActionState } from "react";
 import { submitInquiry, type InquiryFormState } from "@/lib/actions";
 
 interface InquiryFormProps {
-  propertySlug: string;
-  propertyTitle: string;
+  propertySlug?: string;
+  propertyTitle?: string;
+  heading?: string;
+  subject?: string;
+  submitLabel?: string;
 }
 
 const initialState: InquiryFormState = {
@@ -18,7 +21,15 @@ function FieldError({ errors }: { errors?: string[] }) {
   return <p className="text-error text-xs mt-1">{errors[0]}</p>;
 }
 
-export default function InquiryForm({ propertySlug, propertyTitle }: InquiryFormProps) {
+export default function InquiryForm({
+  propertySlug,
+  propertyTitle,
+  heading = "Inquire About Property",
+  subject: subjectProp,
+  submitLabel = "Submit Inquiry",
+}: InquiryFormProps) {
+  const resolvedSubject =
+    subjectProp ?? (propertyTitle ? `Inquiry about ${propertyTitle}` : "General Inquiry");
   const [state, formAction, isPending] = useActionState(submitInquiry, initialState);
 
   if (state.success) {
@@ -45,10 +56,12 @@ export default function InquiryForm({ propertySlug, propertyTitle }: InquiryForm
 
   return (
     <div className="bg-surface-container-low p-8 rounded-xl border border-outline-variant/10">
-      <h3 className="font-display font-bold text-xl mb-6">Inquire About Property</h3>
+      <h3 className="font-display font-bold text-xl mb-6">{heading}</h3>
       <form action={formAction} className="space-y-4">
-        <input type="hidden" name="propertySlug" value={propertySlug} />
-        <input type="hidden" name="subject" value={`Inquiry about ${propertyTitle}`} />
+        {propertySlug && (
+          <input type="hidden" name="propertySlug" value={propertySlug} />
+        )}
+        <input type="hidden" name="subject" value={resolvedSubject} />
 
         <div>
           <label className="block text-xs uppercase tracking-widest text-outline mb-1">
@@ -113,7 +126,7 @@ export default function InquiryForm({ propertySlug, propertyTitle }: InquiryForm
           disabled={isPending}
           className="w-full bg-primary-container text-on-primary-container py-4 rounded-lg font-display font-bold text-lg shadow-lg shadow-primary-container/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-60 disabled:pointer-events-none"
         >
-          {isPending ? "Submitting..." : "Submit Inquiry"}
+          {isPending ? "Submitting..." : submitLabel}
         </button>
       </form>
     </div>
