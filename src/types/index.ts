@@ -69,6 +69,7 @@ export interface Agent {
   phone?: string;
   bio?: string;
   photoUrl?: string;
+  trash: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -103,6 +104,24 @@ export type PropertyCardData = Pick<
   /** Primary display image URL (resolved from images array or provided directly) */
   image: string;
 };
+
+/** Extended card data for the listing page — adds location, parkings, and features */
+export type PropertyListingCardData = PropertyCardData & {
+  country?: string;
+  city?: string;
+  district?: string;
+  parkings?: number;
+  features: string[];
+};
+
+/** Dynamic filter options returned from DB (or mock data) */
+export interface FilterOptions {
+  countries: string[];
+  cities: string[];
+  districts: string[];
+  propertyTypes: string[];
+  features: string[];
+}
 
 // API response types
 export interface PaginatedResponse<T> {

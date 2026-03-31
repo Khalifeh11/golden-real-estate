@@ -8,6 +8,7 @@ export interface IAgent extends Document<string> {
   phone?: string;
   bio?: string;
   photoUrl?: string;
+  trash: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,6 +22,7 @@ const AgentSchema = new Schema<IAgent>(
     phone: String,
     bio: String,
     photoUrl: String,
+    trash: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
