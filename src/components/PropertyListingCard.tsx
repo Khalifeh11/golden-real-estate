@@ -19,6 +19,9 @@ export default function PropertyListingCard({ property }: PropertyListingCardPro
   // Location string: "District, City" or just "City"
   const location = [property.district, property.city, property.country].filter(Boolean).join(", ");
 
+  const hasStats = property.areaSqm != null || property.bedrooms != null ||
+    property.bathrooms != null || property.parkings != null;
+
   return (
     <Link href={`/properties/${property.slug}`} className="group flex flex-col bg-white rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-secondary/5 border border-transparent hover:border-outline-variant/10">
       {/* Image */}
@@ -65,44 +68,48 @@ export default function PropertyListingCard({ property }: PropertyListingCardPro
           </p>
         )}
 
-        {formattedPrice && (
-          <div className="mb-6">
+        <div className="mb-6">
+          {formattedPrice ? (
             <div className="text-2xl font-bold text-primary tracking-tight">
               {formattedPrice}
               {!isSale && (
                 <span className="text-sm font-normal text-outline"> /mo</span>
               )}
             </div>
-          </div>
-        )}
-
-        {/* Stats grid */}
-        <div className="grid grid-cols-2 gap-y-3 mb-6 border-t border-surface-container-low pt-4">
-          {property.areaSqm != null && (
-            <div className="flex items-center gap-2 text-outline">
-              <span className="material-symbols-outlined text-sm">square_foot</span>
-              <span className="text-xs font-semibold">{property.areaSqm} sqm</span>
-            </div>
-          )}
-          {property.bedrooms != null && (
-            <div className="flex items-center gap-2 text-outline">
-              <span className="material-symbols-outlined text-sm">bed</span>
-              <span className="text-xs font-semibold">{property.bedrooms} Beds</span>
-            </div>
-          )}
-          {property.bathrooms != null && (
-            <div className="flex items-center gap-2 text-outline">
-              <span className="material-symbols-outlined text-sm">bathtub</span>
-              <span className="text-xs font-semibold">{property.bathrooms} Baths</span>
-            </div>
-          )}
-          {property.parkings != null && (
-            <div className="flex items-center gap-2 text-outline">
-              <span className="material-symbols-outlined text-sm">directions_car</span>
-              <span className="text-xs font-semibold">{property.parkings} Parking</span>
-            </div>
+          ) : (
+            <p className="text-on-surface text-xs ">Price on Request</p>
           )}
         </div>
+
+        {/* Stats grid */}
+        {hasStats && (
+          <div className="grid grid-cols-2 gap-y-3 mb-6 border-t border-surface-container-low pt-4">
+            {property.areaSqm != null && (
+              <div className="flex items-center gap-2 text-outline">
+                <span className="material-symbols-outlined text-sm">square_foot</span>
+                <span className="text-xs font-semibold">{property.areaSqm} sqm</span>
+              </div>
+            )}
+            {property.bedrooms != null && (
+              <div className="flex items-center gap-2 text-outline">
+                <span className="material-symbols-outlined text-sm">bed</span>
+                <span className="text-xs font-semibold">{property.bedrooms} Beds</span>
+              </div>
+            )}
+            {property.bathrooms != null && (
+              <div className="flex items-center gap-2 text-outline">
+                <span className="material-symbols-outlined text-sm">bathtub</span>
+                <span className="text-xs font-semibold">{property.bathrooms} Baths</span>
+              </div>
+            )}
+            {property.parkings != null && (
+              <div className="flex items-center gap-2 text-outline">
+                <span className="material-symbols-outlined text-sm">directions_car</span>
+                <span className="text-xs font-semibold">{property.parkings} Parking</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Feature tags */}
         {property.features.length > 0 && (

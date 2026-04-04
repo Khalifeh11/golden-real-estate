@@ -97,14 +97,17 @@ export default async function PropertyDetailPage({ params }: Props) {
                 <span className="text-sm">{location}</span>
               </div>
             )}
-            <div className="text-3xl font-display font-bold text-primary-container">
-              {property.price != null
-                ? formatPrice(property.price, property.currency, property.category)
-                : "Price on Request"}
-            </div>
+            {property.price != null ? (
+              <div className="text-3xl font-display font-bold text-primary-container">
+                {formatPrice(property.price, property.currency, property.category)}
+              </div>
+            ) : (
+              <p className="text-on-surface text-sm">Price on Request</p>
+            )}
           </header>
 
           {/* Spec Bar */}
+          {(property.areaSqm != null || property.bedrooms != null || property.bathrooms != null || property.parkings != null) && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-surface-container-low rounded-xl mb-12 border border-outline-variant/10">
             {property.areaSqm != null && (
               <div className="flex flex-col items-center text-center p-2">
@@ -171,6 +174,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               </div>
             )}
           </div>
+          )}
 
           {/* Description */}
           {property.description && (

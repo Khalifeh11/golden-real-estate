@@ -117,7 +117,6 @@ export async function POST(request: NextRequest) {
     ...data,
     slug: finalSlug,
     referenceNumber,
-    images: [],
     imageRefs: [],
   });
 
