@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import type { PropertyCreateData } from "@/lib/validators";
-import type { Agent } from "@/types";
+import type { Agent, PropertyImage } from "@/types";
 import {
   CATEGORIES,
   STATUSES,
@@ -14,15 +14,17 @@ import {
   CURRENCIES,
 } from "@/lib/constants";
 import type { PropertyGroup } from "@/types";
+import PropertyImageUpload from "./PropertyImageUpload";
 
 interface PropertyFormProps {
-  defaultValues?: Partial<PropertyCreateData>;
+  defaultValues?: Partial<PropertyCreateData> & { images?: PropertyImage[] };
   propertyId?: string;
 }
 
 export default function PropertyForm({ defaultValues, propertyId }: PropertyFormProps) {
   const router = useRouter();
   const [agents, setAgents] = useState<Agent[]>([]);
+  const [images, setImages] = useState<PropertyImage[]>(defaultValues?.images ?? []);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -51,7 +53,22 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
       .catch(() => {});
   }, []);
 
-  async function onSubmit(data: PropertyCreateData) {
+  function cleanFormData(data: PropertyCreateData): PropertyCreateData {
+    const cleaned = { ...data };
+    const numberFields = ["price", "areaSqm", "bedrooms", "bathrooms", "parkings", "yearBuilt"] as const;
+    for (const field of numberFields) {
+      if (typeof cleaned[field] === "number" && Number.isNaN(cleaned[field])) {
+        cleaned[field] = undefined;
+      }
+    }
+    if (!cleaned.agentId) {
+      cleaned.agentId = undefined;
+    }
+    return cleaned;
+  }
+
+  async function onSubmit(raw: PropertyCreateData) {
+    const data = cleanFormData(raw);
     setSaving(true);
     setError("");
 
@@ -61,7 +78,7 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: JSON.stringify({ ...data, images }),
     });
 
     if (!res.ok) {
@@ -291,6 +308,9 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
           </div>
         </div>
       </section>
+
+      {/* Images */}
+      <PropertyImageUpload images={images} onChange={setImages} />
 
       {/* Agent + Options */}
       <section className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">

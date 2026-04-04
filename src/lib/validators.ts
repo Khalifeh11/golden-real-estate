@@ -69,6 +69,16 @@ export const propertyCreateSchema = z.object({
   features: z.array(z.string()).default([]),
   agentId: z.string().optional(),
   isFeatured: z.boolean().default(false),
+  images: z
+    .array(
+      z.object({
+        url: z.string().url(),
+        thumbnailUrl: z.string().url(),
+        altText: z.string().default(""),
+        order: z.number().min(0),
+      })
+    )
+    .default([]),
 });
 
 export type PropertyCreateData = z.infer<typeof propertyCreateSchema>;
