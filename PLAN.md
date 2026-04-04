@@ -469,6 +469,15 @@ Audit how admin-created/edited properties appear on public pages. Check for mism
 - Status/category values accepted by admin vs. what public filters expect
 - Image handling consistency between admin upload and public display
 
+### 9. Property Descriptions Contain Raw HTML
+Migrated property descriptions contain HTML from the old ApostropheCMS rich-text editor. Need to:
+- Render HTML safely on public property detail pages (sanitize to prevent XSS)
+- Handle HTML in the admin property form — either use a rich-text editor (e.g., TipTap) or strip HTML for plain-text editing
+- Ensure description previews on property cards/lists are plain-text (strip tags for truncation)
+
+### 8. Public Properties Page — Search & Filters Broken
+The search and filter functionality on the public `/properties` page needs fixing. Investigate and resolve issues with filter behavior, query parameter handling, and search results accuracy.
+
 ### 7. Editing a Property Removes Existing Images
 When editing a property in the admin dashboard, the form does not load the property's existing images. Saving the edit overwrites the `images` array with an empty set, effectively deleting all photos. Need to:
 - Pre-populate the image upload component with the property's current images on edit
