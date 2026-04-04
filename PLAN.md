@@ -441,6 +441,41 @@ Download all 6 tar files locally. Don't extract, just save. This is your backup.
 
 ---
 
+## Known Issues (To Investigate)
+
+### 1. Home Page Search — Category Filter Not Optional
+Searching for a property on the home page without selecting "For Sale" or "For Rent" throws an error. The category filter should be optional — an empty selection should return all categories.
+
+### 2. Admin Dashboard — Minimum Input Values
+Review all form fields in the admin property form to ensure minimum value constraints are correct. Some required fields may be too strict or missing sensible defaults.
+
+### 3. Admin Dashboard — Maximum Price Cap
+There appears to be a hard maximum on property listing price that prevents entering higher values. Need to find where this cap is enforced (Zod validator, form input, or API route) and raise or remove it.
+
+### 4. Admin Dashboard — Property Features Missing
+The old database had features attached to properties (e.g., pool, gym, parking, etc.). The admin dashboard doesn't seem to handle features properly. Need to:
+- Verify the `features` array field is exposed in the property form
+- Decide on UX: free-text tags, predefined checklist, or both
+- Ensure existing migrated features display correctly
+
+### 6. Featured Properties Not Showing on Home Page
+Marking a property as featured via the admin dashboard does not display it on the public home page. The home page currently uses hardcoded placeholder data instead of querying the database for properties with `isFeatured: true`. Need to:
+- Replace the static `FEATURED_PROPERTIES` array in `src/app/page.tsx` with a DB query
+- Ensure the admin "toggle featured" action persists correctly in MongoDB
+
+### 5. Admin Dashboard ↔ Public Pages Alignment
+Audit how admin-created/edited properties appear on public pages. Check for mismatches in:
+- Fields available in admin form vs. fields rendered on property detail/card
+- Status/category values accepted by admin vs. what public filters expect
+- Image handling consistency between admin upload and public display
+
+### 7. Editing a Property Removes Existing Images
+When editing a property in the admin dashboard, the form does not load the property's existing images. Saving the edit overwrites the `images` array with an empty set, effectively deleting all photos. Need to:
+- Pre-populate the image upload component with the property's current images on edit
+- Ensure unchanged images are preserved on save
+
+---
+
 ## Verification
 ```bash
 npm run build && npm run lint
