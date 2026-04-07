@@ -36,6 +36,7 @@ export default async function EditPropertyPage({
     features: property.features ?? [],
     agentId: property.agentId,
     isFeatured: property.isFeatured,
+    images: property.images ?? [],
   };
 
   return (
