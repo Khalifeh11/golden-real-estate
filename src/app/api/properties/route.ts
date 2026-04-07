@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const filter: Record<string, any> = {};
 
-  const q = searchParams.get("q");
+  const q = searchParams.get("q")?.trim();
   if (q) filter.$text = { $search: q };
 
   const category = searchParams.get("category");
@@ -39,8 +39,14 @@ export async function GET(request: NextRequest) {
   const city = searchParams.get("city");
   if (city) filter.city = city;
 
+  const session = await auth();
+  const isAdmin = session?.user?.role && ["ADMIN", "AGENT"].includes(session.user.role);
   const status = searchParams.get("status");
-  if (status) filter.status = status;
+  if (isAdmin && status) {
+    filter.status = status;
+  } else {
+    filter.status = "ACTIVE";
+  }
 
   const ref = searchParams.get("ref");
   if (ref) filter.referenceNumber = ref;

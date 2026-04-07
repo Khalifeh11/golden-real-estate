@@ -25,9 +25,9 @@ export type LoginFormData = z.infer<typeof loginSchema>;
 // --- Property search (URL params) ---
 
 export const propertySearchSchema = z.object({
-  q: z.string().optional(),
-  category: z.enum(["FOR_SALE", "FOR_RENT"]).optional(),
-  propertyGroup: z.enum(["RESIDENTIAL", "COMMERCIAL", "LAND"]).optional(),
+  q: z.string().transform(s => s?.trim() || undefined).optional(),
+  category: z.enum(["FOR_SALE", "FOR_RENT"]).or(z.literal("").transform(() => undefined)).optional(),
+  propertyGroup: z.enum(["RESIDENTIAL", "COMMERCIAL", "LAND"]).or(z.literal("").transform(() => undefined)).optional(),
   propertyType: z.string().optional(),
   country: z.string().optional(),
   city: z.string().optional(),
