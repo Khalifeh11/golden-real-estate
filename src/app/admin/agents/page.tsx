@@ -47,7 +47,7 @@ export default function AdminAgentsPage() {
   }
 
   async function handleDelete(id: string, name: string) {
-    if (!confirm(`Delete agent "${name}"? This cannot be undone.`)) return;
+    if (!confirm(`Delete agent "${name}"? The agent will be removed from the list.`)) return;
     const res = await fetch(`/api/agents/${id}`, { method: "DELETE" });
     if (res.ok) {
       setAgents((prev) => prev.filter((a) => a._id !== id));

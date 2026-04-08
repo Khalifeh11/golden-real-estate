@@ -15,7 +15,7 @@ const agentSchema = z.object({
 
 export async function GET() {
   await dbConnect();
-  const agents = await Agent.find().sort({ firstName: 1 }).lean();
+  const agents = await Agent.find({ trash: { $ne: true } }).sort({ firstName: 1 }).lean();
   return NextResponse.json(agents);
 }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import dbConnect from "@/lib/mongodb";
 import Agent from "@/models/Agent";
+import Property from "@/models/Property";
 import { z } from "zod";
 
 const agentUpdateSchema = z.object({
@@ -62,8 +63,10 @@ export async function DELETE(
   const { id } = await params;
   await dbConnect();
 
-  const agent = await Agent.findByIdAndDelete(id);
+  const agent = await Agent.findByIdAndUpdate(id, { trash: true }, { new: true });
   if (!agent) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  await Property.updateMany({ agentId: id }, { $unset: { agentId: "" } });
 
   return NextResponse.json({ success: true });
 }

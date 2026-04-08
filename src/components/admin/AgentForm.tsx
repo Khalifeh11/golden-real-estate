@@ -15,6 +15,7 @@ export default function AgentForm({ agent, onSave, onCancel }: AgentFormProps) {
     lastName: agent?.lastName ?? "",
     email: agent?.email ?? "",
     phone: agent?.phone ?? "",
+    photoUrl: agent?.photoUrl ?? "",
     bio: agent?.bio ?? "",
   });
   const [saving, setSaving] = useState(false);
@@ -80,6 +81,26 @@ export default function AgentForm({ agent, onSave, onCancel }: AgentFormProps) {
             className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
           />
         </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Photo URL</label>
+        <input
+          type="url"
+          value={form.photoUrl}
+          onChange={(e) => set("photoUrl", e.target.value)}
+          placeholder="https://..."
+          className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+        />
+        {form.photoUrl && (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={form.photoUrl}
+            alt="Preview"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+            onLoad={(e) => { (e.target as HTMLImageElement).style.display = "block"; }}
+            className="mt-2 w-12 h-12 rounded-full object-cover"
+          />
+        )}
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
