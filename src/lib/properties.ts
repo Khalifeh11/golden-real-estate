@@ -109,6 +109,15 @@ export async function getFilterOptions(context?: {
   return { countries, cities, districts, propertyTypes, features: [] };
 }
 
+export async function getFeaturedProperties(limit = 6): Promise<PropertyCardData[]> {
+  await dbConnect();
+  const docs = await PropertyModel.find({ status: "ACTIVE", isFeatured: true })
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .lean();
+  return (docs as unknown as Property[]).map(toPropertyCardData);
+}
+
 // ---------------------------------------------------------------------------
 // Property detail helpers
 // ---------------------------------------------------------------------------

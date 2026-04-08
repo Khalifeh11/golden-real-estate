@@ -5,91 +5,10 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import PropertyCard from "@/components/PropertyCard";
-import type { PropertyCardData } from "@/types";
+import { getFeaturedProperties } from "@/lib/properties";
 
-// Placeholder featured properties — will be replaced with DB query
-const FEATURED_PROPERTIES: PropertyCardData[] = [
-  {
-    slug: "ocean-view-estate",
-    title: "Ocean View Estate",
-    price: 4_250_000,
-    currency: "USD",
-    category: "FOR_SALE" as const,
-    areaSqm: 450,
-    bedrooms: 5,
-    bathrooms: 4,
-    referenceNumber: "225520",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBqRRdkdKRwFcCN88n12vM1uLE1HSc5MAxTTCk6UYOuFXqRyViBx_dQaX_nExVpSV13dbSB5-AQuI-xF8Buoy8Yqhvaw85vGyCk2cwtgrvkpVyLuYy2Stjg8A-5xGCh6SQFNWOHpwtT8DT-IPPDs7w7nfcUgiQ619Fzx6Fc0nY3mBIzEaxyAUYAGcbqbRfZtj4M4dPIC5iQk6_KU4irye8W55sFxSMiAZH1ngRYrVv0oZRGxZmchgveTCIbEA4p8CqL9eg56cqGtMpq",
-  },
-  {
-    slug: "the-azure-penthouse",
-    title: "The Azure Penthouse",
-    price: 12_000,
-    currency: "USD",
-    category: "FOR_RENT" as const,
-    areaSqm: 280,
-    bedrooms: 3,
-    bathrooms: 3,
-    referenceNumber: "225521",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuC2F4bZXayDrYNdLgkUExO_zr8IP6DvJ25eDM750a3hY36kH1jG60D5lTD7vNbumv1JlNNt-b3HS8jMFlbjY3tFEWhKmOTjISbtNQm9iR_3L_Wco3-jRmLDPx4l0u2qKcAn3zW8Dw7wh0jR27v5pLjva4XtAl5-wwyfv_7-_knReii0TClqc2q_XCOxGTpJyY1kxsGAqg9ZiMuJ49koW6FyQpWCZIDli45cpwurt8t80uDw9Jz7LMHqKrmTbeDKZA67cx1JqzrqyfFs",
-  },
-  {
-    slug: "cedar-hill-retreat",
-    title: "Cedar Hill Retreat",
-    price: 1_890_000,
-    currency: "USD",
-    category: "FOR_SALE" as const,
-    areaSqm: 320,
-    bedrooms: 4,
-    bathrooms: 3,
-    referenceNumber: "225522",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuC_rQ_5-UWOxSE9-DewglLMSCfh_DVVxrG4K6UgFkn2ZCTgO2q1K8u9NiPByvWK0wnPHp5ko6p3MDKzSohijuU5lJMKB6lQXMf7ZDP5GRgabsS-86r8_-l07re4U6N0vlcwYumW-wpRvQB9aCRLao1q2Bb21EDPJOFEAWlRZsVXNqUdvu_WSPl-49Elk7Y39r5fAeljXZYwPrl-IpN_9-BDLhpVE_yB1TWaRb3gaHndwEj8BBscxJpr2ykgSt8hgP5kWG6978vfdg4C",
-  },
-  {
-    slug: "emerald-forest-lodge",
-    title: "Emerald Forest Lodge",
-    price: 2_100_000,
-    currency: "USD",
-    category: "FOR_SALE" as const,
-    areaSqm: 190,
-    bedrooms: 2,
-    bathrooms: 2,
-    referenceNumber: "225523",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAftt3_sTDQOBFAN-JZb_GWPtKKoww84Y9yJgmcliduhiEohnyNySFAGk00rOghGDy1hB6suDATXk_V2x52GYpMRF0Qe42_SCfqi3KFpk2ZXM9BQQJMwYgvdL7eS3ytP0tprZvqhCCkzSqXIhxuStX6Hf_Pp_cAc7FbTXMteShlIUlXUCznFrwTWURqPVyoClGC7JH9nM6kCcbPfFkP8gDpTCsJFhinU6BtYFYjbZH4f5xnSMO07pGRTpuSDXPnAsG2rzlcEfkCpJLR",
-  },
-  {
-    slug: "the-legacy-manor",
-    title: "The Legacy Manor",
-    price: 5_750_000,
-    currency: "USD",
-    category: "FOR_SALE" as const,
-    areaSqm: 850,
-    bedrooms: 7,
-    bathrooms: 6,
-    referenceNumber: "225524",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBirYw-KcN7vxTbrd7uwjYMWOipKZ8MyAgpuXeBmDq0Y17FhHBnhPdKI14yFhGWFva5itIl0khRIQdbKE8CbZuWGSkqPe3U4qqewpsC-oR0X9W5WlrxMtHlVb7HcCXMSMQTGWsi7qa9VAAWAgZ8pDcWDBAhWb2JtQuGcv81BDjnTlppyjcgg-JqrXgJaRa90WTm7IKjwv-zOnIU19qRdLBLZw1TGre6lP56jlLrbEzxGU4JRwBfZYbSkLB0sukdU94-_cEuSZwYVktz",
-  },
-  {
-    slug: "crystal-horizon",
-    title: "Crystal Horizon",
-    price: 3_400_000,
-    currency: "USD",
-    category: "FOR_SALE" as const,
-    areaSqm: 410,
-    bedrooms: 4,
-    bathrooms: 4,
-    referenceNumber: "225525",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuA_u7257JlmMUFGeTGMWY8pF429MskPB_k2NhqgVVG6sdmwBr0LN1K0cpEP-9ylnaIuX14u8M1RVjaVC196Y4_I8sywl6o2daOBtc8elOwW3ZCgTfqjkTVaPp_gSTLD9exqwrO1HIOq6-aHA7oGzwZruRvpWHXACqBKFGAdhDtb6XOxtB7gjx2uNNKoFc6fcKjMenofxQQxUOBNkGWg1xTFH1SnNNaZQPqipxQ0-93meLR_Po51QT9NtkDQ-oc3QpeAcUBBJu0KXMa3",
-  },
-];
-
-export default function Home() {
+export default async function Home() {
+  const featuredProperties = await getFeaturedProperties();
   return (
     <>
       <div className="flex flex-col h-screen">
@@ -167,6 +86,7 @@ export default function Home() {
 
       <main className="max-w-[1280px] mx-auto px-6 space-y-32 my-32">
         {/* Featured Properties */}
+        {featuredProperties.length > 0 && (
         <section>
           <div className="flex justify-between items-end mb-16">
             <div>
@@ -191,7 +111,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {FEATURED_PROPERTIES.map((property) => (
+            {featuredProperties.map((property) => (
               <PropertyCard key={property.slug} property={property} />
             ))}
           </div>
@@ -206,6 +126,7 @@ export default function Home() {
             </Link>
           </div>
         </section>
+        )}
 
         {/* About / Heritage Section */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
