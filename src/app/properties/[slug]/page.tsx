@@ -7,6 +7,11 @@ import AgentCard from "@/components/AgentCard";
 import InquiryForm from "@/components/InquiryForm";
 import PropertyCard from "@/components/PropertyCard";
 import Navbar from "@/components/Navbar";
+import DOMPurify from "isomorphic-dompurify";
+
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, "");
+}
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -22,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = `${property.title} | Golden Land Real Estate`;
   const description = property.description
-    ? property.description.slice(0, 160)
+    ? stripHtml(property.description).slice(0, 160)
     : `${property.title} — ${categoryLabel(property.category ?? "FOR_SALE")} in ${[property.district, property.city, property.country].filter(Boolean).join(", ")}`;
 
   const primaryImage = [...(property.images ?? [])].sort(
@@ -182,11 +187,12 @@ export default async function PropertyDetailPage({ params }: Props) {
               <h2 className="text-2xl font-display font-bold text-secondary mb-6">
                 Description
               </h2>
-              <div className="text-on-surface-variant leading-relaxed text-lg space-y-4">
-                {property.description.split("\n").filter(Boolean).map((p, i) => (
-                  <p key={i}>{p}</p>
-                ))}
-              </div>
+              <div
+                className="prose prose-lg max-w-none text-on-surface-variant"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(property.description),
+                }}
+              />
             </section>
           )}
 

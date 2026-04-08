@@ -15,6 +15,7 @@ import {
 } from "@/lib/constants";
 import type { PropertyGroup } from "@/types";
 import PropertyImageUpload from "./PropertyImageUpload";
+import RichTextEditor from "./RichTextEditor";
 
 interface PropertyFormProps {
   defaultValues?: Partial<PropertyCreateData> & { images?: PropertyImage[] };
@@ -32,6 +33,7 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<PropertyCreateData>({
     defaultValues: {
@@ -115,10 +117,9 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-          <textarea
-            {...register("description")}
-            rows={4}
-            className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 resize-y"
+          <RichTextEditor
+            content={defaultValues?.description ?? ""}
+            onChange={(html) => setValue("description", html)}
           />
         </div>
 
