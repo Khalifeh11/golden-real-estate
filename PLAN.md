@@ -441,47 +441,56 @@ Download all 6 tar files locally. Don't extract, just save. This is your backup.
 
 ---
 
-## Known Issues (To Investigate)
+## Known Issues
 
-### 1. Home Page Search — Category Filter Not Optional
-Searching for a property on the home page without selecting "For Sale" or "For Rent" throws an error. The category filter should be optional — an empty selection should return all categories.
+### Resolved
+- ~~#1. Home Page Search — Category Filter Not Optional~~ — Fixed: validator accepts empty string
+- ~~#2. Admin Dashboard — Minimum Input Values~~ — Fixed: all numeric fields have sensible min constraints
+- ~~#4. Admin Dashboard — Property Features Missing~~ — Fixed: added PREDEFINED_FEATURES checkbox grid + custom feature input to PropertyForm
+- ~~#6. Featured Properties Not Showing on Home Page~~ — Fixed: home page queries DB
+- ~~#7. Editing a Property Removes Existing Images~~ — Fixed: edit page passes images to form
+- ~~#8. Public Properties Page — Search & Filters Broken~~ — Fixed: validator/API hardening, whitespace trim, default ACTIVE status
+- ~~#9. Property Descriptions Contain Raw HTML~~ — Fixed: sanitized rendering + stripHtml for SEO
+- ~~#11. Public Search & Filters — UX Overhaul~~ — Fixed: property group/type filters, beds/baths filters, features filter, text index search all working
+- ~~#12. Agent photoUrl Missing from Admin Form~~ — Fixed: added image upload to AgentForm (replaces URL input)
+- ~~#13. Agent Hard-Delete Instead of Soft-Delete~~ — Fixed: DELETE sets `trash: true`, unsets `agentId` on orphaned properties, GET filters trashed agents
 
-### 2. Admin Dashboard — Minimum Input Values
-Review all form fields in the admin property form to ensure minimum value constraints are correct. Some required fields may be too strict or missing sensible defaults.
+### Open
 
-### 3. Admin Dashboard — Maximum Price Cap
-There appears to be a hard maximum on property listing price that prevents entering higher values. Need to find where this cap is enforced (Zod validator, form input, or API route) and raise or remove it.
+#### #3. Admin Dashboard — Slider Max vs Actual Prices
+UI slider caps filtering at $1.5M (sale) / $5K (rent) in `constants.ts`. The admin form and API have no max — properties with higher prices just can't be found via the slider. May need to raise slider bounds or add an "above X" option.
 
-### 4. Admin Dashboard — Property Features Missing
-The old database had features attached to properties (e.g., pool, gym, parking, etc.). The admin dashboard doesn't seem to handle features properly. Need to:
-- Verify the `features` array field is exposed in the property form
-- Decide on UX: free-text tags, predefined checklist, or both
-- Ensure existing migrated features display correctly
+#### #5. Admin Dashboard ↔ Public Pages Alignment (Partial)
+Most admin↔public gaps have been fixed (features, agent photos, images). Remaining:
+- `imageRefs` is dead code (never populated by admin, never read by public) — cleanup candidate
+- `commission`, `latitude`, `longitude` exist in model but admin can't set and public doesn't display
 
-### 6. Featured Properties Not Showing on Home Page
-Marking a property as featured via the admin dashboard does not display it on the public home page. The home page currently uses hardcoded placeholder data instead of querying the database for properties with `isFeatured: true`. Need to:
-- Replace the static `FEATURED_PROPERTIES` array in `src/app/page.tsx` with a DB query
-- Ensure the admin "toggle featured" action persists correctly in MongoDB
+#### #10. Rent Period Not Tracked
+No dedicated field to distinguish monthly vs. annual rent. The old data embedded this in description text (e.g., "For Rent at 18,000 USD per year"). Currently `formatPrice()` hardcodes "/mo" for all FOR_RENT properties. Need to:
+- Add a `rentPeriod` field ("MONTHLY" | "YEARLY" | null) to the Property model, types, and validator
+- Add a rent period selector in the admin form (only shown when category is FOR_RENT)
+- Update `formatPrice()` to display "/mo" or "/yr" based on the field, or nothing when null
+- Leave existing listings untouched (null = no label shown)
 
-### 5. Admin Dashboard ↔ Public Pages Alignment
-Audit how admin-created/edited properties appear on public pages. Check for mismatches in:
-- Fields available in admin form vs. fields rendered on property detail/card
-- Status/category values accepted by admin vs. what public filters expect
-- Image handling consistency between admin upload and public display
+#### #14. Admin Trash & Restore System
+Soft-deleted agents currently vanish with no way to recover them. Need a trash system across all deletable entities:
+- Add `trash` field to Property model (Agent already has it)
+- Add `trash` field to ContactRequest model
+- Convert Property and Contact DELETE handlers to soft-delete
+- Build `/admin/trash` page with tabs (Properties / Agents / Contacts) showing trashed items
+- Actions per item: Restore (set `trash: false`) and Permanently Delete
+- Add "Trash" link to AdminSidebar
 
-### 9. Property Descriptions Contain Raw HTML
-Migrated property descriptions contain HTML from the old ApostropheCMS rich-text editor. Need to:
-- Render HTML safely on public property detail pages (sanitize to prevent XSS)
-- Handle HTML in the admin property form — either use a rich-text editor (e.g., TipTap) or strip HTML for plain-text editing
-- Ensure description previews on property cards/lists are plain-text (strip tags for truncation)
+Key files:
+- `src/models/Property.ts` — add `trash` field
+- `src/models/ContactRequest.ts` — add `trash` field
+- `src/app/api/properties/[id]/route.ts` — change DELETE to soft-delete
+- `src/app/api/admin/contacts/[id]/route.ts` — add DELETE handler
+- `src/app/admin/trash/page.tsx` — new page
+- `src/components/admin/AdminSidebar.tsx` — add nav item
 
-### 8. Public Properties Page — Search & Filters Broken
-The search and filter functionality on the public `/properties` page needs fixing. Investigate and resolve issues with filter behavior, query parameter handling, and search results accuracy.
-
-### 7. Editing a Property Removes Existing Images
-When editing a property in the admin dashboard, the form does not load the property's existing images. Saving the edit overwrites the `images` array with an empty set, effectively deleting all photos. Need to:
-- Pre-populate the image upload component with the property's current images on edit
-- Ensure unchanged images are preserved on save
+#### #15. Contact Management — No Delete or Archive
+Contact submissions accumulate with no way to remove or archive them. The admin can only toggle read/responded status. Related to #14 — contacts should support soft-delete as part of the trash system.
 
 ---
 
