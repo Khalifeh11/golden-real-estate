@@ -457,9 +457,6 @@ Download all 6 tar files locally. Don't extract, just save. This is your backup.
 
 ### Open
 
-#### #3. Admin Dashboard — Slider Max vs Actual Prices
-UI slider caps filtering at $1.5M (sale) / $5K (rent) in `constants.ts`. The admin form and API have no max — properties with higher prices just can't be found via the slider. May need to raise slider bounds or add an "above X" option.
-
 #### #5. Admin Dashboard ↔ Public Pages Alignment (Partial)
 Most admin↔public gaps have been fixed (features, agent photos, images). Remaining:
 - `imageRefs` is dead code (never populated by admin, never read by public) — cleanup candidate
