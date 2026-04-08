@@ -51,10 +51,7 @@ export async function searchProperties(
   }
 
   if (params.q) {
-    filter.$or = [
-      { title: { $regex: params.q, $options: "i" } },
-      { description: { $regex: params.q, $options: "i" } },
-    ];
+    filter.$text = { $search: params.q };
   }
 
   const sortMap: Record<string, Record<string, 1 | -1>> = {
@@ -63,12 +60,18 @@ export async function searchProperties(
     price_desc: { price: -1 },
     area_desc: { areaSqm: -1 },
   };
-  const sort = sortMap[params.sort ?? "newest"] ?? sortMap.newest;
+
+  let sort: Record<string, 1 | -1 | { $meta: string }>;
+  if (params.q && (!params.sort || params.sort === "relevance")) {
+    sort = { score: { $meta: "textScore" } };
+  } else {
+    sort = sortMap[params.sort ?? "newest"] ?? sortMap.newest;
+  }
 
   const skip = (params.page - 1) * params.limit;
 
   const [docs, total] = await Promise.all([
-    PropertyModel.find(filter).sort(sort).skip(skip).limit(params.limit).lean(),
+    PropertyModel.find(filter).sort(sort as Record<string, 1 | -1 | { $meta: "textScore" }>).skip(skip).limit(params.limit).lean(),
     PropertyModel.countDocuments(filter),
   ]);
 

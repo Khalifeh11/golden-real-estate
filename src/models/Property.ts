@@ -122,5 +122,29 @@ const PropertySchema = new Schema<IProperty>(
   { timestamps: true }
 );
 
+PropertySchema.index(
+  {
+    title: "text",
+    propertyType: "text",
+    city: "text",
+    district: "text",
+    features: "text",
+    country: "text",
+    description: "text",
+  },
+  {
+    weights: {
+      title: 10,
+      propertyType: 8,
+      city: 6,
+      district: 5,
+      features: 4,
+      country: 3,
+      description: 1,
+    },
+    name: "property_text_search",
+  }
+);
+
 export default mongoose.models.Property ||
   mongoose.model<IProperty>("Property", PropertySchema);

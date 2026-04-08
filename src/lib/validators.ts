@@ -39,7 +39,7 @@ export const propertySearchSchema = z.object({
   bedrooms: z.coerce.number().min(0).optional(),
   bathrooms: z.coerce.number().min(0).optional(),
   ref: z.string().optional(),
-  sort: z.enum(["newest", "price_asc", "price_desc", "area_desc"]).optional(),
+  sort: z.enum(["newest", "price_asc", "price_desc", "area_desc", "relevance"]).optional(),
   page: z.coerce.number().min(1).optional().default(1),
   limit: z.coerce.number().min(1).max(100).optional().default(24),
 });

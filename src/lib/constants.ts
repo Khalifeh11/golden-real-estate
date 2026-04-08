@@ -79,6 +79,7 @@ export function getSliderConfig(category: string | null) {
 
 export const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
+  { value: "relevance", label: "Most Relevant" },
   { value: "price_asc", label: "Price: Low to High" },
   { value: "price_desc", label: "Price: High to Low" },
   { value: "area_desc", label: "Area: Large to Small" },

@@ -7,12 +7,24 @@ export default function SortDropdown() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const currentSort = searchParams.get("sort") ?? "newest";
+  const hasQuery = !!searchParams.get("q");
+  const explicitSort = searchParams.get("sort");
+
+  // When a text query is active and no explicit sort is set, default to relevance
+  const currentSort = explicitSort ?? (hasQuery ? "relevance" : "newest");
+
+  // Only show "Most Relevant" when there's an active text query
+  const options = hasQuery
+    ? SORT_OPTIONS
+    : SORT_OPTIONS.filter((opt) => opt.value !== "relevance");
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const params = new URLSearchParams(searchParams.toString());
     const value = e.target.value;
-    if (value === "newest") {
+    // Clear sort param when selecting the default for current state
+    if (value === "newest" && !hasQuery) {
+      params.delete("sort");
+    } else if (value === "relevance" && hasQuery) {
       params.delete("sort");
     } else {
       params.set("sort", value);
@@ -26,7 +38,7 @@ export default function SortDropdown() {
       onChange={handleChange}
       className="bg-surface border-none rounded-lg py-2 px-4 text-sm font-semibold text-secondary focus:ring-0 cursor-pointer"
     >
-      {SORT_OPTIONS.map((opt) => (
+      {options.map((opt) => (
         <option key={opt.value} value={opt.value}>
           {opt.label}
         </option>
