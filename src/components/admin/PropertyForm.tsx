@@ -12,6 +12,7 @@ import {
   PROPERTY_TYPES,
   COUNTRIES,
   CURRENCIES,
+  PREDEFINED_FEATURES,
 } from "@/lib/constants";
 import type { PropertyGroup } from "@/types";
 import PropertyImageUpload from "./PropertyImageUpload";
@@ -28,6 +29,7 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
   const [images, setImages] = useState<PropertyImage[]>(defaultValues?.images ?? []);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [customFeature, setCustomFeature] = useState("");
 
   const {
     register,
@@ -47,6 +49,7 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
 
   const propertyGroup = watch("propertyGroup") as PropertyGroup | undefined;
   const isResidential = propertyGroup === "RESIDENTIAL";
+  const features = watch("features") ?? [];
 
   useEffect(() => {
     fetch("/api/agents")
@@ -308,6 +311,88 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
             />
           </div>
         </div>
+      </section>
+
+      {/* Features */}
+      <section className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+        <h2 className="font-semibold text-gray-900">Features</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {PREDEFINED_FEATURES.map((feature) => (
+            <label key={feature} className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+              <input
+                type="checkbox"
+                className="w-4 h-4"
+                checked={features.includes(feature)}
+                onChange={() => {
+                  if (features.includes(feature)) {
+                    setValue("features", features.filter((f) => f !== feature));
+                  } else {
+                    setValue("features", [...features, feature]);
+                  }
+                }}
+              />
+              {feature}
+            </label>
+          ))}
+        </div>
+
+        <div className="flex gap-2">
+          <input
+            value={customFeature}
+            onChange={(e) => setCustomFeature(e.target.value)}
+            placeholder="Add custom feature..."
+            className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                const trimmed = customFeature.trim();
+                if (trimmed && !features.some((f) => f.toLowerCase() === trimmed.toLowerCase())) {
+                  setValue("features", [...features, trimmed]);
+                  setCustomFeature("");
+                }
+              }
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => {
+              const trimmed = customFeature.trim();
+              if (trimmed && !features.some((f) => f.toLowerCase() === trimmed.toLowerCase())) {
+                setValue("features", [...features, trimmed]);
+                setCustomFeature("");
+              }
+            }}
+            className="bg-gray-100 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-200 transition-colors"
+          >
+            Add
+          </button>
+        </div>
+
+        {(() => {
+          const customSelected = features.filter(
+            (f) => !PREDEFINED_FEATURES.includes(f as typeof PREDEFINED_FEATURES[number])
+          );
+          if (customSelected.length === 0) return null;
+          return (
+            <div className="flex flex-wrap gap-2">
+              {customSelected.map((f) => (
+                <span
+                  key={f}
+                  className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-xs font-medium px-2.5 py-1 rounded"
+                >
+                  {f}
+                  <button
+                    type="button"
+                    onClick={() => setValue("features", features.filter((x) => x !== f))}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    &times;
+                  </button>
+                </span>
+              ))}
+            </div>
+          );
+        })()}
       </section>
 
       {/* Images */}

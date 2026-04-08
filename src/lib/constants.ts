@@ -77,6 +77,24 @@ export function getSliderConfig(category: string | null) {
   return DEFAULT_SLIDER_CONFIG;
 }
 
+export const PREDEFINED_FEATURES = [
+  "Pool",
+  "Garden",
+  "Terrace",
+  "Parking",
+  "Gym",
+  "Security",
+  "Concierge",
+  "Furnished",
+  "Sea View",
+  "Central Cooling & Heating",
+  "Smart Home",
+  "Storage",
+  "Balcony",
+  "Beach Front",
+  "Historic",
+] as const;
+
 export const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
   { value: "relevance", label: "Most Relevant" },

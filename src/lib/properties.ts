@@ -50,6 +50,10 @@ export async function searchProperties(
     filter.areaSqm = areaFilter;
   }
 
+  if (params.features && params.features.length > 0) {
+    filter.features = { $all: params.features };
+  }
+
   if (params.q) {
     filter.$text = { $search: params.q };
   }
@@ -102,14 +106,15 @@ export async function getFilterOptions(context?: {
     districtFilter.city = context.city;
   }
 
-  const [countries, cities, districts, propertyTypes] = await Promise.all([
+  const [countries, cities, districts, propertyTypes, features] = await Promise.all([
     PropertyModel.distinct("country", activeFilter),
     PropertyModel.distinct("city", cityFilter),
     PropertyModel.distinct("district", districtFilter),
     PropertyModel.distinct("propertyType", activeFilter),
+    PropertyModel.distinct("features", activeFilter),
   ]);
 
-  return { countries, cities, districts, propertyTypes, features: [] };
+  return { countries, cities, districts, propertyTypes, features: features.sort() };
 }
 
 export async function getFeaturedProperties(limit = 6): Promise<PropertyCardData[]> {

@@ -73,6 +73,9 @@ export async function GET(request: NextRequest) {
   const bathrooms = searchParams.get("bathrooms");
   if (bathrooms) filter.bathrooms = { $gte: Number(bathrooms) };
 
+  const features = searchParams.getAll("features");
+  if (features.length > 0) filter.features = { $all: features };
+
   const sortParam = searchParams.get("sort") ?? "newest";
   const sortMap: Record<string, Record<string, 1 | -1>> = {
     newest: { createdAt: -1 },
