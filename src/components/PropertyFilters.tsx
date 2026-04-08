@@ -3,9 +3,9 @@
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useState, useEffect, useTransition } from "react";
 import * as Slider from "@radix-ui/react-slider";
-import { CATEGORIES, getSliderConfig } from "@/lib/constants";
+import { CATEGORIES, PROPERTY_GROUPS, PROPERTY_TYPES, ALL_PROPERTY_TYPES, getSliderConfig } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import type { FilterOptions } from "@/types";
+import type { FilterOptions, PropertyGroup } from "@/types";
 
 function formatPriceLabel(value: number, max: number): string {
   if (value >= max) {
@@ -31,6 +31,17 @@ export default function PropertyFilters({ filterOptions }: PropertyFiltersProps)
   // Local state for debounced text inputs
   const [keyword, setKeyword] = useState(searchParams.get("q") ?? "");
   const [refNumber, setRefNumber] = useState(searchParams.get("ref") ?? "");
+  const [moreOpen, setMoreOpen] = useState(() => {
+    return !!(
+      searchParams.get("ref") ||
+      searchParams.get("district") ||
+      searchParams.get("minArea") ||
+      searchParams.get("maxArea") ||
+      searchParams.get("bedrooms") ||
+      searchParams.get("bathrooms") ||
+      searchParams.getAll("features").length > 0
+    );
+  });
 
   const updateParams = useCallback(
     (updates: Record<string, string | null>) => {
@@ -74,9 +85,18 @@ export default function PropertyFilters({ filterOptions }: PropertyFiltersProps)
   }, [refNumber, searchParams, updateParams]);
 
   const activeCategory = searchParams.get("category");
+  const activePropertyGroup = searchParams.get("propertyGroup") as PropertyGroup | null;
+  const activePropertyType = searchParams.get("propertyType") ?? "";
+  const activeBedrooms = searchParams.get("bedrooms") ?? "";
+  const activeBathrooms = searchParams.get("bathrooms") ?? "";
   const activeCountry = searchParams.get("country") ?? "";
   const activeCity = searchParams.get("city") ?? "";
   const activeDistrict = searchParams.get("district") ?? "";
+  const activeFeatures = searchParams.getAll("features");
+
+  const propertyTypeOptions = activePropertyGroup
+    ? PROPERTY_TYPES[activePropertyGroup]
+    : ALL_PROPERTY_TYPES;
 
   // Slider config adapts to selected category (rent vs sale)
   const { price: priceConfig, area: areaConfig } = getSliderConfig(activeCategory);
@@ -97,10 +117,20 @@ export default function PropertyFilters({ filterOptions }: PropertyFiltersProps)
   const [dragAreaRange, setDragAreaRange] = useState<[number, number] | null>(null);
   const areaRange = dragAreaRange ?? [urlMinArea, urlMaxArea];
 
+  // Count active "more filters" to show badge
+  const moreFilterCount = [
+    !!searchParams.get("ref"),
+    !!activeDistrict,
+    rawMinArea !== null || rawMaxArea !== null,
+    !!activeBedrooms,
+    !!activeBathrooms,
+    activeFeatures.length > 0,
+  ].filter(Boolean).length;
+
   return (
     <aside
       className={cn(
-        "w-full lg:w-[280px] shrink-0 lg:sticky lg:top-20 space-y-8 bg-surface-container-low p-6 rounded-xl",
+        "w-full lg:w-[280px] shrink-0 lg:top-20 space-y-6 bg-surface-container-low p-6 rounded-xl",
         isPending && "opacity-70 pointer-events-none"
       )}
     >
@@ -111,26 +141,15 @@ export default function PropertyFilters({ filterOptions }: PropertyFiltersProps)
           Search Filters
         </h3>
 
-        {/* Search & Ref */}
-        <div className="space-y-4">
-          <div className="relative">
-            <input
-              className="w-full bg-surface border-none rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-outline-variant"
-              placeholder="Keyword search..."
-              type="text"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-            />
-          </div>
-          <div className="relative">
-            <input
-              className="w-full bg-surface border-none rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-outline-variant"
-              placeholder="Reference Number"
-              type="text"
-              value={refNumber}
-              onChange={(e) => setRefNumber(e.target.value)}
-            />
-          </div>
+        {/* Keyword Search */}
+        <div className="relative">
+          <input
+            className="w-full bg-surface border-none rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-outline-variant"
+            placeholder="Keyword search..."
+            type="text"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+          />
         </div>
       </div>
 
@@ -165,7 +184,52 @@ export default function PropertyFilters({ filterOptions }: PropertyFiltersProps)
         </div>
       </div>
 
-      {/* Location Selects */}
+      {/* Property Group */}
+      <div>
+        <label className="block text-xs font-bold text-outline uppercase tracking-widest mb-3">
+          Property Group
+        </label>
+        <div className="grid grid-cols-3 gap-2">
+          {PROPERTY_GROUPS.map((group) => (
+            <button
+              key={group.value}
+              onClick={() =>
+                updateParams({
+                  propertyGroup: activePropertyGroup === group.value ? null : group.value,
+                  propertyType: null,
+                })
+              }
+              className={cn(
+                "py-2 px-2 text-xs font-semibold rounded-lg border-none transition-colors",
+                activePropertyGroup === group.value
+                  ? "bg-primary-container text-on-primary-container shadow-sm"
+                  : "bg-surface text-secondary hover:bg-surface-variant"
+              )}
+            >
+              {group.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Property Type */}
+      <div>
+        <label className="block text-xs font-bold text-outline uppercase tracking-widest mb-1.5">
+          Property Type
+        </label>
+        <select
+          className="w-full bg-surface border-none rounded-lg py-2.5 px-4 text-sm text-secondary focus:ring-2 focus:ring-primary/20 cursor-pointer"
+          value={activePropertyType}
+          onChange={(e) => updateParams({ propertyType: e.target.value || null })}
+        >
+          <option value="">All Types</option>
+          {propertyTypeOptions.map((t) => (
+            <option key={t.value} value={t.value}>{t.label}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Location: Country + City */}
       <div className="space-y-4">
         <div>
           <label className="block text-xs font-bold text-outline uppercase tracking-widest mb-1.5">
@@ -197,129 +261,219 @@ export default function PropertyFilters({ filterOptions }: PropertyFiltersProps)
             ))}
           </select>
         </div>
-        <div>
-          <label className="block text-xs font-bold text-outline uppercase tracking-widest mb-1.5">
-            District
-          </label>
-          <select
-            className="w-full bg-surface border-none rounded-lg py-2.5 px-4 text-sm text-secondary focus:ring-2 focus:ring-primary/20 cursor-pointer"
-            value={activeDistrict}
-            onChange={(e) => updateParams({ district: e.target.value || null })}
-          >
-            <option value="">All Districts</option>
-            {filterOptions.districts.map((d) => (
-              <option key={d} value={d}>{d}</option>
-            ))}
-          </select>
-        </div>
       </div>
 
       {/* Price Range Slider */}
-      <div className="space-y-6">
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <label className="text-xs font-bold text-outline uppercase tracking-widest">
-              Price Range
-            </label>
-          </div>
-          <Slider.Root
-            className="relative flex items-center select-none touch-none w-full h-4"
-            value={priceRange}
-            min={priceConfig.min}
-            max={priceConfig.max}
-            step={priceConfig.step}
-            onValueChange={(value) => setDragPriceRange(value as [number, number])}
-            onValueCommit={(value) => {
-              setDragPriceRange(null);
-              updateParams({
-                minPrice: value[0] > priceConfig.min ? String(value[0]) : null,
-                maxPrice: value[1] < priceConfig.max ? String(value[1]) : null,
-              });
-            }}
-          >
-            <Slider.Track className="bg-outline-variant relative grow rounded-full h-1.5">
-              <Slider.Range className="absolute bg-primary rounded-full h-full" />
-            </Slider.Track>
-            <Slider.Thumb className="block w-4 h-4 bg-white border-2 border-primary rounded-full shadow-sm focus:outline-none" />
-            <Slider.Thumb className="block w-4 h-4 bg-white border-2 border-primary rounded-full shadow-sm focus:outline-none" />
-          </Slider.Root>
-          <div className="flex justify-between mt-3 text-[10px] font-bold text-secondary uppercase">
-            <span>{formatPriceLabel(priceRange[0], priceConfig.max)}</span>
-            <span>{formatPriceLabel(priceRange[1], priceConfig.max)}</span>
-          </div>
+      <div>
+        <div className="flex justify-between items-center mb-2">
+          <label className="text-xs font-bold text-outline uppercase tracking-widest">
+            Price Range
+          </label>
         </div>
-
-        {/* Area Range Slider */}
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <label className="text-xs font-bold text-outline uppercase tracking-widest">
-              Space (sqm)
-            </label>
-          </div>
-          <Slider.Root
-            className="relative flex items-center select-none touch-none w-full h-4"
-            value={areaRange}
-            min={areaConfig.min}
-            max={areaConfig.max}
-            step={areaConfig.step}
-            onValueChange={(value) => setDragAreaRange(value as [number, number])}
-            onValueCommit={(value) => {
-              setDragAreaRange(null);
-              updateParams({
-                minArea: value[0] > areaConfig.min ? String(value[0]) : null,
-                maxArea: value[1] < areaConfig.max ? String(value[1]) : null,
-              });
-            }}
-          >
-            <Slider.Track className="bg-outline-variant relative grow rounded-full h-1.5">
-              <Slider.Range className="absolute bg-primary rounded-full h-full" />
-            </Slider.Track>
-            <Slider.Thumb className="block w-4 h-4 bg-white border-2 border-primary rounded-full shadow-sm focus:outline-none" />
-            <Slider.Thumb className="block w-4 h-4 bg-white border-2 border-primary rounded-full shadow-sm focus:outline-none" />
-          </Slider.Root>
-          <div className="flex justify-between mt-3 text-[10px] font-bold text-secondary uppercase">
-            <span>{areaRange[0]} sqm</span>
-            <span>{areaRange[1] >= areaConfig.max ? `${areaConfig.max.toLocaleString()}+` : `${areaRange[1].toLocaleString()} sqm`}</span>
-          </div>
+        <Slider.Root
+          className="relative flex items-center select-none touch-none w-full h-4"
+          value={priceRange}
+          min={priceConfig.min}
+          max={priceConfig.max}
+          step={priceConfig.step}
+          onValueChange={(value) => setDragPriceRange(value as [number, number])}
+          onValueCommit={(value) => {
+            setDragPriceRange(null);
+            updateParams({
+              minPrice: value[0] > priceConfig.min ? String(value[0]) : null,
+              maxPrice: value[1] < priceConfig.max ? String(value[1]) : null,
+            });
+          }}
+        >
+          <Slider.Track className="bg-outline-variant relative grow rounded-full h-1.5">
+            <Slider.Range className="absolute bg-primary rounded-full h-full" />
+          </Slider.Track>
+          <Slider.Thumb className="block w-4 h-4 bg-white border-2 border-primary rounded-full shadow-sm focus:outline-none" />
+          <Slider.Thumb className="block w-4 h-4 bg-white border-2 border-primary rounded-full shadow-sm focus:outline-none" />
+        </Slider.Root>
+        <div className="flex justify-between mt-3 text-[10px] font-bold text-secondary uppercase">
+          <span>{formatPriceLabel(priceRange[0], priceConfig.max)}</span>
+          <span>{formatPriceLabel(priceRange[1], priceConfig.max)}</span>
         </div>
       </div>
 
-      {/* Features */}
-      {filterOptions.features.length > 0 && (
-        <div>
-          <label className="block text-xs font-bold text-outline uppercase tracking-widest mb-4">
-            Features
-          </label>
-          <div className="space-y-3">
-            {filterOptions.features.map((feature) => (
-              <label key={feature} className="flex items-center gap-3 cursor-pointer group">
-                <input
-                  className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20"
-                  type="checkbox"
-                  checked={searchParams.getAll("features").includes(feature)}
-                  onChange={(e) => {
-                    const params = new URLSearchParams(searchParams.toString());
-                    const current = params.getAll("features");
-                    params.delete("features");
-                    if (e.target.checked) {
-                      [...current, feature].forEach((f) => params.append("features", f));
-                    } else {
-                      current.filter((f) => f !== feature).forEach((f) => params.append("features", f));
-                    }
-                    params.delete("page");
-                    startTransition(() => {
-                      router.push(`${pathname}?${params.toString()}`, { scroll: false });
-                    });
-                  }}
-                />
-                <span className="text-sm text-secondary group-hover:text-primary transition-colors">
-                  {feature}
-                </span>
+      {/* ─── More Filters (collapsible) ─── */}
+      <div>
+        <button
+          type="button"
+          onClick={() => setMoreOpen((o) => !o)}
+          className="w-full flex items-center justify-between py-2.5 px-4 bg-surface rounded-lg text-sm font-semibold text-secondary hover:bg-surface-variant transition-colors"
+        >
+          <span className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-base">tune</span>
+            More Filters
+            {moreFilterCount > 0 && (
+              <span className="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold bg-primary text-on-primary rounded-full">
+                {moreFilterCount}
+              </span>
+            )}
+          </span>
+          <span
+            className={cn(
+              "material-symbols-outlined text-base transition-transform duration-200",
+              moreOpen && "rotate-180"
+            )}
+          >
+            expand_more
+          </span>
+        </button>
+
+        {moreOpen && (
+          <div className="mt-4 space-y-6">
+            {/* Reference Number */}
+            <div>
+              <label className="block text-xs font-bold text-outline uppercase tracking-widest mb-1.5">
+                Reference Number
               </label>
-            ))}
+              <input
+                className="w-full bg-surface border-none rounded-lg py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-outline-variant"
+                placeholder="e.g. GL-12345"
+                type="text"
+                value={refNumber}
+                onChange={(e) => setRefNumber(e.target.value)}
+              />
+            </div>
+
+            {/* District */}
+            <div>
+              <label className="block text-xs font-bold text-outline uppercase tracking-widest mb-1.5">
+                District
+              </label>
+              <select
+                className="w-full bg-surface border-none rounded-lg py-2.5 px-4 text-sm text-secondary focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                value={activeDistrict}
+                onChange={(e) => updateParams({ district: e.target.value || null })}
+              >
+                <option value="">All Districts</option>
+                {filterOptions.districts.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Area Range Slider */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-xs font-bold text-outline uppercase tracking-widest">
+                  Space (sqm)
+                </label>
+              </div>
+              <Slider.Root
+                className="relative flex items-center select-none touch-none w-full h-4"
+                value={areaRange}
+                min={areaConfig.min}
+                max={areaConfig.max}
+                step={areaConfig.step}
+                onValueChange={(value) => setDragAreaRange(value as [number, number])}
+                onValueCommit={(value) => {
+                  setDragAreaRange(null);
+                  updateParams({
+                    minArea: value[0] > areaConfig.min ? String(value[0]) : null,
+                    maxArea: value[1] < areaConfig.max ? String(value[1]) : null,
+                  });
+                }}
+              >
+                <Slider.Track className="bg-outline-variant relative grow rounded-full h-1.5">
+                  <Slider.Range className="absolute bg-primary rounded-full h-full" />
+                </Slider.Track>
+                <Slider.Thumb className="block w-4 h-4 bg-white border-2 border-primary rounded-full shadow-sm focus:outline-none" />
+                <Slider.Thumb className="block w-4 h-4 bg-white border-2 border-primary rounded-full shadow-sm focus:outline-none" />
+              </Slider.Root>
+              <div className="flex justify-between mt-3 text-[10px] font-bold text-secondary uppercase">
+                <span>{areaRange[0]} sqm</span>
+                <span>{areaRange[1] >= areaConfig.max ? `${areaConfig.max.toLocaleString()}+` : `${areaRange[1].toLocaleString()} sqm`}</span>
+              </div>
+            </div>
+
+            {/* Bedrooms & Bathrooms */}
+            {activePropertyGroup !== "LAND" && (
+              <div>
+                <label className="block text-xs font-bold text-outline uppercase tracking-widest mb-3">
+                  Rooms
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-outline uppercase tracking-widest mb-1">
+                      Bedrooms
+                    </label>
+                    <select
+                      className="w-full bg-surface border-none rounded-lg py-2.5 px-3 text-sm text-secondary focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                      value={activeBedrooms}
+                      onChange={(e) => updateParams({ bedrooms: e.target.value || null })}
+                    >
+                      <option value="">Any</option>
+                      <option value="1">1+</option>
+                      <option value="2">2+</option>
+                      <option value="3">3+</option>
+                      <option value="4">4+</option>
+                      <option value="5">5+</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-outline uppercase tracking-widest mb-1">
+                      Bathrooms
+                    </label>
+                    <select
+                      className="w-full bg-surface border-none rounded-lg py-2.5 px-3 text-sm text-secondary focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                      value={activeBathrooms}
+                      onChange={(e) => updateParams({ bathrooms: e.target.value || null })}
+                    >
+                      <option value="">Any</option>
+                      <option value="1">1+</option>
+                      <option value="2">2+</option>
+                      <option value="3">3+</option>
+                      <option value="4">4+</option>
+                      <option value="5">5+</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Features */}
+            {filterOptions.features.length > 0 && (
+              <div>
+                <label className="block text-xs font-bold text-outline uppercase tracking-widest mb-4">
+                  Features
+                </label>
+                <div className="space-y-3 max-h-48 overflow-y-auto">
+                  {filterOptions.features.map((feature) => (
+                    <label key={feature} className="flex items-center gap-3 cursor-pointer group">
+                      <input
+                        className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20"
+                        type="checkbox"
+                        checked={activeFeatures.includes(feature)}
+                        onChange={(e) => {
+                          const params = new URLSearchParams(searchParams.toString());
+                          const current = params.getAll("features");
+                          params.delete("features");
+                          if (e.target.checked) {
+                            [...current, feature].forEach((f) => params.append("features", f));
+                          } else {
+                            current.filter((f) => f !== feature).forEach((f) => params.append("features", f));
+                          }
+                          params.delete("page");
+                          startTransition(() => {
+                            router.push(`${pathname}?${params.toString()}`, { scroll: false });
+                          });
+                        }}
+                      />
+                      <span className="text-sm text-secondary group-hover:text-primary transition-colors">
+                        {feature}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </aside>
   );
 }
