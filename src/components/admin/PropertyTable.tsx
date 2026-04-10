@@ -73,7 +73,7 @@ export default function PropertyTable({
                 {p.referenceNumber ?? "—"}
               </td>
               <td className="px-4 py-3 whitespace-nowrap">
-                {p.price ? formatPrice(p.price, p.currency, p.category) : "—"}
+                {p.price ? formatPrice(p.price, p.currency, p.category, p.rentPeriod) : "—"}
               </td>
               <td className="px-4 py-3">
                 <select

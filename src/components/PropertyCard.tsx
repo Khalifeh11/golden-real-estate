@@ -39,7 +39,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           </h3>
           {property.price != null ? (
             <p className="text-secondary font-bold text-xl">
-              {formatPrice(property.price, property.currency, property.category)}
+              {formatPrice(property.price, property.currency, property.category, property.rentPeriod)}
             </p>
           ) : (
             <p className="text-on-surface text-xs">Price on Request</p>

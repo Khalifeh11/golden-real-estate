@@ -8,13 +8,16 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /** Format price with currency symbol and commas: 1250000 → "$1,250,000" */
-export function formatPrice(price: number, currency: string = "USD", category?: string): string {
+export function formatPrice(price: number, currency: string = "USD", category?: string, rentPeriod?: string | null): string {
   const formatted = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
     maximumFractionDigits: 0,
   }).format(price);
-  return category === "FOR_RENT" ? `${formatted} / mo` : formatted;
+  if (category !== "FOR_RENT") return formatted;
+  if (rentPeriod === "YEARLY") return `${formatted} / yr`;
+  if (rentPeriod === "MONTHLY") return `${formatted} / mo`;
+  return formatted;
 }
 
 /** Slugify text: "Modern Penthouse in Achrafieh" → "modern-penthouse-in-achrafieh" */
@@ -55,6 +58,7 @@ export function toPropertyCardData(property: Property): PropertyCardData {
     price: property.price,
     currency: property.currency,
     category: property.category,
+    rentPeriod: property.rentPeriod,
     areaSqm: property.areaSqm,
     bedrooms: property.bedrooms,
     bathrooms: property.bathrooms,
@@ -101,6 +105,7 @@ export function toPropertyListingCardData(property: Property): PropertyListingCa
     price: property.price,
     currency: property.currency,
     category: property.category,
+    rentPeriod: property.rentPeriod,
     areaSqm: property.areaSqm,
     bedrooms: property.bedrooms,
     bathrooms: property.bathrooms,

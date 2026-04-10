@@ -48,6 +48,7 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
   });
 
   const propertyGroup = watch("propertyGroup") as PropertyGroup | undefined;
+  const selectedCategory = watch("category");
   const isResidential = propertyGroup === "RESIDENTIAL";
   const features = watch("features") ?? [];
 
@@ -212,6 +213,19 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
             </select>
           </div>
         </div>
+        {selectedCategory === "FOR_RENT" && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Rent Period</label>
+            <select
+              {...register("rentPeriod")}
+              className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 max-w-xs"
+            >
+              <option value="">Not specified</option>
+              <option value="MONTHLY">Monthly</option>
+              <option value="YEARLY">Yearly</option>
+            </select>
+          </div>
+        )}
       </section>
 
       {/* Location */}

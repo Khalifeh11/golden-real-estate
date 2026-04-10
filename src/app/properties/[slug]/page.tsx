@@ -104,7 +104,7 @@ export default async function PropertyDetailPage({ params }: Props) {
             )}
             {property.price != null ? (
               <div className="text-3xl font-display font-bold text-primary-container">
-                {formatPrice(property.price, property.currency, property.category)}
+                {formatPrice(property.price, property.currency, property.category, property.rentPeriod)}
               </div>
             ) : (
               <p className="text-on-surface text-sm">Price on Request</p>
