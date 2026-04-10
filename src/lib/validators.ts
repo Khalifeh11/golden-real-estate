@@ -57,6 +57,7 @@ export const propertyCreateSchema = z.object({
   price: z.number().min(0, "Price must be positive").optional(),
   currency: z.enum(["USD", "EUR"]).default("USD"),
   category: z.enum(["FOR_SALE", "FOR_RENT"]),
+  rentPeriod: z.enum(["MONTHLY", "YEARLY"]).nullable().optional(),
   propertyGroup: z.enum(["RESIDENTIAL", "COMMERCIAL", "LAND"]),
   propertyType: z.string().min(1, "Property type is required"),
   status: z.enum(["ACTIVE", "PENDING", "SOLD", "UNDER_OFFER", "INACTIVE"]).default("ACTIVE"),

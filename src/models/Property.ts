@@ -1,13 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface IImageRef {
-  attachmentId: string;
-  filename: string;
-  extension: string;
-  isThumbnail: boolean;
-  order: number;
-}
-
 export interface IImage {
   url: string;
   thumbnailUrl: string;
@@ -24,6 +16,7 @@ export interface IProperty extends Document<string> {
   price?: number;
   currency: string;
   category?: string;
+  rentPeriod?: string;
   propertyGroup?: string;
   propertyType?: string;
   status: string;
@@ -40,25 +33,14 @@ export interface IProperty extends Document<string> {
   commission?: string;
   view?: string;
   features: string[];
-  imageRefs: IImageRef[];
   images: IImage[];
   agentId?: string;
+  trash: boolean;
   isFeatured: boolean;
   views: number;
   createdAt: Date;
   updatedAt: Date;
 }
-
-const ImageRefSchema = new Schema<IImageRef>(
-  {
-    attachmentId: String,
-    filename: String,
-    extension: String,
-    isThumbnail: Boolean,
-    order: Number,
-  },
-  { _id: false }
-);
 
 const ImageSchema = new Schema<IImage>(
   {
@@ -82,6 +64,10 @@ const PropertySchema = new Schema<IProperty>(
     category: {
       type: String,
       enum: ["FOR_SALE", "FOR_RENT", null],
+    },
+    rentPeriod: {
+      type: String,
+      enum: ["MONTHLY", "YEARLY", null],
     },
     propertyGroup: {
       type: String,
@@ -113,9 +99,9 @@ const PropertySchema = new Schema<IProperty>(
     commission: String,
     view: String,
     features: [String],
-    imageRefs: [ImageRefSchema],
     images: [ImageSchema],
     agentId: { type: String, ref: "Agent" },
+    trash: { type: Boolean, default: false },
     isFeatured: { type: Boolean, default: false },
     views: { type: Number, default: 0 },
   },

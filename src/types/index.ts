@@ -11,14 +11,7 @@ export type PropertyType =
 export type PropertyStatus = "ACTIVE" | "PENDING" | "SOLD" | "UNDER_OFFER" | "INACTIVE";
 export type UserRole = "ADMIN" | "AGENT";
 export type Currency = "USD" | "EUR";
-
-export interface ImageRef {
-  attachmentId: string;
-  filename: string;
-  extension: string;
-  isThumbnail: boolean;
-  order: number;
-}
+export type RentPeriod = "MONTHLY" | "YEARLY";
 
 export interface PropertyImage {
   url: string;
@@ -36,6 +29,7 @@ export interface Property {
   price?: number;
   currency: Currency;
   category?: Category;
+  rentPeriod?: RentPeriod;
   propertyGroup?: PropertyGroup;
   propertyType?: PropertyType;
   status: PropertyStatus;
@@ -52,9 +46,9 @@ export interface Property {
   commission?: string;
   view?: string;
   features: string[];
-  imageRefs: ImageRef[];
   images: PropertyImage[];
   agentId?: string;
+  trash: boolean;
   isFeatured: boolean;
   views: number;
   createdAt: string;
@@ -93,13 +87,14 @@ export interface ContactRequest {
   message?: string;
   isRead: boolean;
   isResponded: boolean;
+  trash: boolean;
   createdAt: string;
 }
 
 /** Minimum data needed to render a property card */
 export type PropertyCardData = Pick<
   Property,
-  "slug" | "title" | "price" | "currency" | "category" | "areaSqm" | "bedrooms" | "bathrooms" | "referenceNumber"
+  "slug" | "title" | "price" | "currency" | "category" | "rentPeriod" | "areaSqm" | "bedrooms" | "bathrooms" | "referenceNumber"
 > & {
   /** Primary display image URL (resolved from images array or provided directly) */
   image: string;

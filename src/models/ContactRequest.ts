@@ -10,6 +10,7 @@ export interface IContactRequest extends Document<string> {
   message?: string;
   isRead: boolean;
   isResponded: boolean;
+  trash: boolean;
   createdAt: Date;
 }
 
@@ -23,6 +24,7 @@ const ContactRequestSchema = new Schema<IContactRequest>({
   message: String,
   isRead: { type: Boolean, default: false },
   isResponded: { type: Boolean, default: false },
+  trash: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
 
