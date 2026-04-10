@@ -106,15 +106,14 @@ export async function getFilterOptions(context?: {
     districtFilter.city = context.city;
   }
 
-  const [countries, cities, districts, propertyTypes, features] = await Promise.all([
+  const [countries, cities, districts, propertyTypes] = await Promise.all([
     PropertyModel.distinct("country", activeFilter),
     PropertyModel.distinct("city", cityFilter),
     PropertyModel.distinct("district", districtFilter),
     PropertyModel.distinct("propertyType", activeFilter),
-    PropertyModel.distinct("features", activeFilter),
   ]);
 
-  return { countries, cities, districts, propertyTypes, features: features.sort() };
+  return { countries, cities, districts, propertyTypes };
 }
 
 export async function getFeaturedProperties(limit = 6): Promise<PropertyCardData[]> {

@@ -115,7 +115,6 @@ export interface FilterOptions {
   cities: string[];
   districts: string[];
   propertyTypes: string[];
-  features: string[];
 }
 
 // API response types

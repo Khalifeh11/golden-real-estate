@@ -38,8 +38,7 @@ export default function PropertyFilters({ filterOptions }: PropertyFiltersProps)
       searchParams.get("minArea") ||
       searchParams.get("maxArea") ||
       searchParams.get("bedrooms") ||
-      searchParams.get("bathrooms") ||
-      searchParams.getAll("features").length > 0
+      searchParams.get("bathrooms")
     );
   });
 
@@ -92,8 +91,6 @@ export default function PropertyFilters({ filterOptions }: PropertyFiltersProps)
   const activeCountry = searchParams.get("country") ?? "";
   const activeCity = searchParams.get("city") ?? "";
   const activeDistrict = searchParams.get("district") ?? "";
-  const activeFeatures = searchParams.getAll("features");
-
   const propertyTypeOptions = activePropertyGroup
     ? PROPERTY_TYPES[activePropertyGroup]
     : ALL_PROPERTY_TYPES;
@@ -124,7 +121,6 @@ export default function PropertyFilters({ filterOptions }: PropertyFiltersProps)
     rawMinArea !== null || rawMaxArea !== null,
     !!activeBedrooms,
     !!activeBathrooms,
-    activeFeatures.length > 0,
   ].filter(Boolean).length;
 
   return (
@@ -435,42 +431,6 @@ export default function PropertyFilters({ filterOptions }: PropertyFiltersProps)
               </div>
             )}
 
-            {/* Features */}
-            {filterOptions.features.length > 0 && (
-              <div>
-                <label className="block text-xs font-bold text-outline uppercase tracking-widest mb-4">
-                  Features
-                </label>
-                <div className="space-y-3 max-h-48 overflow-y-auto">
-                  {filterOptions.features.map((feature) => (
-                    <label key={feature} className="flex items-center gap-3 cursor-pointer group">
-                      <input
-                        className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20"
-                        type="checkbox"
-                        checked={activeFeatures.includes(feature)}
-                        onChange={(e) => {
-                          const params = new URLSearchParams(searchParams.toString());
-                          const current = params.getAll("features");
-                          params.delete("features");
-                          if (e.target.checked) {
-                            [...current, feature].forEach((f) => params.append("features", f));
-                          } else {
-                            current.filter((f) => f !== feature).forEach((f) => params.append("features", f));
-                          }
-                          params.delete("page");
-                          startTransition(() => {
-                            router.push(`${pathname}?${params.toString()}`, { scroll: false });
-                          });
-                        }}
-                      />
-                      <span className="text-sm text-secondary group-hover:text-primary transition-colors">
-                        {feature}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         )}
       </div>
