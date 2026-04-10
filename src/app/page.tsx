@@ -91,7 +91,7 @@ export default async function Home() {
           <div className="flex justify-between items-end mb-16">
             <div>
               <span className="text-primary font-bold tracking-[0.2em] text-xs uppercase mb-3 block">
-                Curated Selection
+                Featured
               </span>
               <h2 className="font-display text-4xl md:text-5xl font-bold text-secondary">
                 Featured Properties
@@ -102,7 +102,7 @@ export default async function Home() {
                 href="/properties"
                 className="text-secondary hover:text-primary transition-colors flex items-center gap-2 font-semibold"
               >
-                View All Collections
+                View All Properties
                 <span className="material-symbols-outlined text-sm">
                   arrow_forward
                 </span>
@@ -122,7 +122,7 @@ export default async function Home() {
               href="/properties"
               className="text-secondary hover:text-primary transition-colors font-semibold"
             >
-              View All Collections &rarr;
+              View All Properties &rarr;
             </Link>
           </div>
         </section>
@@ -150,21 +150,23 @@ export default async function Home() {
                 Our Heritage
               </span>
               <h2 className="font-display text-4xl md:text-5xl font-bold text-secondary leading-tight">
-                Refined Coastal Luxury
+                Mediterranean Real Estate, Redefined
               </h2>
             </div>
             <p className="text-secondary text-lg leading-relaxed opacity-90">
-              At Golden Land Real Estate, we believe a home is more than just a
-              structure — it is a masterpiece of architectural mastery and a
-              sanctuary for the soul. Specializing in high-end coastal
-              properties, we curate a portfolio that defines the horizon of
-              modern living.
+              At Golden Land Real Estate, we believe every property represents
+              a meaningful chapter in our clients&apos; lives. With thousands of
+              listings across Lebanon, Greece, Cyprus, and beyond, we offer
+              one of the most comprehensive property portfolios in the
+              Mediterranean — from city apartments to seaside villas, land
+              to commercial spaces.
             </p>
             <p className="text-secondary text-lg leading-relaxed opacity-90">
               Our commitment to excellence ensures that every transaction is
-              handled with the same precision and artistry as the properties we
-              represent. Experience a refined concierge service tailored to the
-              most discerning global clients.
+              handled with care and professionalism. Whether you are buying
+              your first apartment, investing in land, or searching for a
+              rental, our team of property advisors is here to guide you at
+              every step.
             </p>
             <div className="pt-6">
               <Link

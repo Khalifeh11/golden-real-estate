@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About Us | Golden Land Real Estate",
   description:
-    "Redefining luxury property acquisition across the Mediterranean since 2012. Discover our heritage, values, and the markets we serve.",
+    "Golden Land Real Estate — a trusted Mediterranean property company since 2012. Discover our heritage, values, and the markets we serve.",
 };
 
 const VALUES = [
@@ -34,7 +34,7 @@ const VALUES = [
     icon: "concierge",
     title: "Bespoke Service",
     description:
-      "Every client's journey is tailored, reflecting the unique aspirations of the individual collector.",
+      "Every client's journey is tailored, reflecting their unique goals and circumstances.",
   },
 ];
 
@@ -42,21 +42,21 @@ const MARKETS = [
   {
     name: "Lebanon",
     description:
-      "Where ancient history meets modern luxury. We specialize in the most prestigious waterfront estates in Beirut and Byblos.",
+      "Our largest market, with thousands of properties across Matn, Keserwan, Beirut, and dozens of other regions — from apartments and land to villas and commercial spaces.",
     image:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuC6QB9aivyBiLgS0I97gyRCcBVfFRw2tqJkWPzJoS0Y92NtXFH2uY8On3e8hgkN1623yb1CkU0NeqYd8oJ5UGfZiCF4ZN1RnieR0Dyl3rJgXPe_7fBjusQCFj6F50VAqc_FRN4E14oTtFWsYixtUeWftUYSM0JixENl3kYczU77VsPGLnHdM7hF2kdfq02EoMI78Bc37EILrVsRpm2HAcODZYNY-cQ-5PZC-w0qEGw3rXF8I2rw0P2A_DnmLtd5AKk9reGeoffDUEt6",
   },
   {
     name: "Cyprus",
     description:
-      "The jewel of the Levant. Our Cypriot portfolio features avant-garde villas and high-growth investment properties.",
+      "A growing portfolio of residential and investment properties across the island, from coastal apartments to inland developments.",
     image:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuBMDEa-3x9LPhbql7tlI_O2WJffkSZlxCeg6uIOOX6QUhSdJD2T6uRahOFEQerOxO2Y3xz8aiyA_z3spiGoHGHrFMqpLhVKN2o9Bky7vaaUugiU3M7cnR-KlX7uhMg4BAQxn_sv-KBtuy5_J97aJmAYHS_DSz4JmGNEswiYHz9t3jxxkhJWhR3ylhMrl4R86dWmnzrN3N4OVtbI4V08nv60TFs20OY48dLDfu53ptTN5-s5oooCC9i_7yNxbNnBUDSXjZkW9Y_vF2k0",
   },
   {
     name: "Greece",
     description:
-      "Eternal beauty and serene landscapes. Offering exclusive access to the hidden gems of the Aegean and Ionian seas.",
+      "A diverse selection of properties centered on Athens and the surrounding regions, with opportunities across the mainland and islands.",
     image:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuCtE_ChBwtnwnXt3TydzlP0J6oeKTt_ev6j1CzR2UrysDFG30yVO7505Hlywyj5wAZWdBzRKHF_SZ0nxoIlZ9_jboGZPGDh21J_8eq_65VvsE1zky5T0agw2bKXeCTQhjFigerH7yTDcnXM37YQy2m0VfCBIa0GfbLbk1lvXevGhKJxit_goUyiviiErouHUxSq5_HjOloh84JfKOOEtgAb67Oe8z58EHcMa1-goAfotc8eduHIUIqeWj2810NNHTkcUFWYZ4ds4E9h",
   },
@@ -91,8 +91,7 @@ export default function AboutPage() {
               Our Story
             </h1>
             <p className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-              Redefining luxury property acquisition across the Mediterranean
-              since 2012.
+              A trusted Mediterranean property company since 2012.
             </p>
           </div>
         </section>
@@ -120,23 +119,24 @@ export default function AboutPage() {
                   Our Heritage
                 </span>
                 <h2 className="font-display text-3xl md:text-5xl font-bold text-secondary tracking-tight">
-                  A Legacy of Coastal Excellence
+                  A Legacy of Mediterranean Expertise
                 </h2>
               </div>
               <div className="space-y-6 text-on-surface-variant text-lg leading-relaxed">
                 <p>
-                  Founded on the shores of the Mediterranean, Golden Land Real
-                  Estate began with a singular vision: to treat every property
-                  not as a transaction, but as a masterpiece of architectural
-                  heritage. For over a decade, we have curated the most exclusive
-                  coastal estates for a discerning global clientele.
+                  Founded in 2012, Golden Land Real Estate began with a clear
+                  mission: to make property search across the Mediterranean
+                  straightforward, transparent, and rewarding. Over the past
+                  decade, we have grown into one of the region&apos;s most
+                  comprehensive property platforms, serving buyers, renters,
+                  and investors alike.
                 </p>
                 <p>
-                  Our philosophy is rooted in the belief that luxury is found in
-                  the details&mdash;the alignment of the sunrise, the grain of
-                  local limestone, and the seamless integration of modern comfort
-                  with historical context. We are more than advisors; we are
-                  curators of the coastal lifestyle.
+                  Our philosophy is rooted in deep local knowledge and honest
+                  guidance. We know these markets — the neighborhoods, the
+                  pricing, the opportunities — and we put that expertise to
+                  work for every client, whether they are searching for a
+                  family apartment or a commercial investment.
                 </p>
               </div>
             </div>
@@ -183,7 +183,7 @@ export default function AboutPage() {
                 Our Reach
               </span>
               <h2 className="font-display text-3xl md:text-5xl font-bold text-secondary tracking-tight">
-                Three Markets, One Standard of Excellence
+                Three Primary Markets, One Standard of Service
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -247,9 +247,10 @@ export default function AboutPage() {
                 </h2>
               </div>
               <p className="text-on-surface-variant text-lg leading-relaxed">
-                Our multilingual team of advisors brings together decades of
-                experience in legal, financial, and architectural consulting to
-                ensure your acquisition is as seamless as the coastal horizon.
+                Our multilingual team of property advisors brings together
+                decades of experience in local markets, legal requirements,
+                and financial planning to guide you through every step of the
+                process.
               </p>
               <Link
                 href="/agents"
@@ -287,8 +288,8 @@ export default function AboutPage() {
               </h2>
             </div>
             <p className="text-on-surface-variant text-lg md:text-xl leading-relaxed">
-              Connect with us today for a private consultation or to receive our
-              exclusive off-market portfolio.
+              Connect with us today for a consultation, or browse our full
+              portfolio of properties across the Mediterranean.
             </p>
             <div className="pt-6">
               <Link

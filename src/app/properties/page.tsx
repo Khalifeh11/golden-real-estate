@@ -12,7 +12,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Properties | Golden Land Real Estate",
   description:
-    "Browse curated coastal residences and architectural masterpieces across Lebanon, Cyprus, and Greece.",
+    "Browse thousands of properties for sale and rent across Lebanon, Cyprus, Greece, and more. Apartments, villas, land, and commercial spaces.",
 };
 
 export default async function PropertiesPage({
@@ -41,7 +41,7 @@ export default async function PropertiesPage({
             Properties
           </h1>
           <p className="text-outline font-medium">
-            Curated coastal residences and architectural masterpieces.
+            Apartments, villas, land, and more across the Mediterranean.
           </p>
         </div>
 

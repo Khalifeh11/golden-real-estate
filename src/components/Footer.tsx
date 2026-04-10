@@ -9,8 +9,8 @@ export default function Footer() {
           Golden Land Real Estate
         </div>
         <p className="text-slate-300 opacity-80 mb-6">
-          Redefining luxury property acquisition through architectural mastery
-          and curated service.
+          Your trusted partner for property across the Mediterranean since
+          2012.
         </p>
         <p className="text-slate-300 opacity-80 text-xs">
           &copy; {new Date().getFullYear()} Golden Land Real Estate. All rights
