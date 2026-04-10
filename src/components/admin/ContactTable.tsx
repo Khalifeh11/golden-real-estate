@@ -7,9 +7,10 @@ interface ContactTableProps {
   contacts: ContactRequest[];
   onMarkRead: (id: string, isRead: boolean) => Promise<void>;
   onMarkResponded: (id: string, isResponded: boolean) => Promise<void>;
+  onDelete?: (id: string) => void;
 }
 
-export default function ContactTable({ contacts, onMarkRead, onMarkResponded }: ContactTableProps) {
+export default function ContactTable({ contacts, onMarkRead, onMarkResponded, onDelete }: ContactTableProps) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
@@ -83,6 +84,16 @@ export default function ContactTable({ contacts, onMarkRead, onMarkResponded }: 
                 >
                   {c.isResponded ? "Mark not responded" : "Mark responded"}
                 </button>
+                {onDelete && (
+                  <button
+                    onClick={() => {
+                      if (confirm(`Delete contact from "${c.name}"?`)) onDelete(c._id);
+                    }}
+                    className="text-xs px-3 py-1 rounded border border-red-200 text-red-500 hover:bg-red-50"
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
           )}

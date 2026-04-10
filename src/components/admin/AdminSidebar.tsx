@@ -11,6 +11,7 @@ const navItems = [
   { href: "/admin/agents", label: "Agents", icon: "👤", adminOnly: true },
   { href: "/admin/contacts", label: "Contacts", icon: "✉" },
   { href: "/admin/users", label: "Users", icon: "👥", adminOnly: true },
+  { href: "/admin/trash", label: "Trash", icon: "🗑", adminOnly: true },
 ];
 
 interface AdminSidebarProps {

@@ -23,19 +23,19 @@ export default async function AdminOverviewPage() {
     recentProperties,
     recentContacts,
   ] = await Promise.all([
-    Property.countDocuments(),
-    Property.countDocuments({ status: "ACTIVE" }),
-    Property.countDocuments({ status: "PENDING" }),
-    Agent.countDocuments(),
+    Property.countDocuments({ trash: { $ne: true } }),
+    Property.countDocuments({ status: "ACTIVE", trash: { $ne: true } }),
+    Property.countDocuments({ status: "PENDING", trash: { $ne: true } }),
+    Agent.countDocuments({ trash: { $ne: true } }),
     User.countDocuments(),
-    ContactRequest.countDocuments(),
-    ContactRequest.countDocuments({ isRead: false }),
-    Property.find()
+    ContactRequest.countDocuments({ trash: { $ne: true } }),
+    ContactRequest.countDocuments({ isRead: false, trash: { $ne: true } }),
+    Property.find({ trash: { $ne: true } })
       .sort({ createdAt: -1 })
       .limit(5)
       .select("title slug status category price currency createdAt")
       .lean(),
-    ContactRequest.find()
+    ContactRequest.find({ trash: { $ne: true } })
       .sort({ createdAt: -1 })
       .limit(5)
       .select("name email subject isRead createdAt")

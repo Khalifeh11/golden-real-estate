@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   const isRead = searchParams.get("isRead");
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const filter: Record<string, any> = {};
+  const filter: Record<string, any> = { trash: { $ne: true } };
   if (isRead === "true") filter.isRead = true;
   if (isRead === "false") filter.isRead = false;
 

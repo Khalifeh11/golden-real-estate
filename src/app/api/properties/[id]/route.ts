@@ -60,7 +60,7 @@ export async function DELETE(
   const { id } = await params;
   await dbConnect();
 
-  const property = await Property.findByIdAndDelete(id);
+  const property = await Property.findByIdAndUpdate(id, { trash: true }, { new: true });
   if (!property) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

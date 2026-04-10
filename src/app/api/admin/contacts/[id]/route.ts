@@ -34,3 +34,23 @@ export async function PATCH(
 
   return NextResponse.json(contact);
 }
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (session?.user?.role !== "ADMIN") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const { id } = await params;
+  await dbConnect();
+
+  const contact = await ContactRequest.findByIdAndUpdate(id, { trash: true }, { new: true });
+  if (!contact) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  return NextResponse.json({ success: true });
+}

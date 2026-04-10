@@ -49,6 +49,14 @@ export default function AdminContactsPage() {
     setContacts((prev) => prev.map((c) => (c._id === id ? { ...c, isResponded } : c)));
   }
 
+  async function handleDelete(id: string) {
+    const res = await fetch(`/api/admin/contacts/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      setContacts((prev) => prev.filter((c) => c._id !== id));
+      setTotal((t) => t - 1);
+    }
+  }
+
   const totalPages = Math.ceil(total / limit);
 
   return (
@@ -77,6 +85,7 @@ export default function AdminContactsPage() {
             contacts={contacts}
             onMarkRead={handleMarkRead}
             onMarkResponded={handleMarkResponded}
+            onDelete={handleDelete}
           />
         )}
       </div>

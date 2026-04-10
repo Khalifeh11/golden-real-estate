@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const skip = (page - 1) * limit;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const filter: Record<string, any> = {};
+  const filter: Record<string, any> = { trash: { $ne: true } };
 
   const q = searchParams.get("q")?.trim();
   if (q) filter.$text = { $search: q };
@@ -38,6 +38,9 @@ export async function GET(request: NextRequest) {
 
   const city = searchParams.get("city");
   if (city) filter.city = city;
+
+  const district = searchParams.get("district");
+  if (district) filter.district = district;
 
   const session = await auth();
   const isAdmin = session?.user?.role && ["ADMIN", "AGENT"].includes(session.user.role);
@@ -126,7 +129,6 @@ export async function POST(request: NextRequest) {
     ...data,
     slug: finalSlug,
     referenceNumber,
-    imageRefs: [],
   });
 
   return NextResponse.json(property, { status: 201 });
