@@ -10,15 +10,17 @@ export default function AdminAgentsPage() {
   const [editing, setEditing] = useState<Agent | null>(null);
   const [creating, setCreating] = useState(false);
 
-  async function fetchAgents() {
-    const res = await fetch("/api/agents");
-    const data = await res.json();
-    setAgents(data);
-    setLoading(false);
-  }
-
   useEffect(() => {
-    fetchAgents();
+    let cancelled = false;
+    fetch("/api/agents")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled) {
+          setAgents(data);
+          setLoading(false);
+        }
+      });
+    return () => { cancelled = true; };
   }, []);
 
   async function handleCreate(data: Partial<Agent>) {

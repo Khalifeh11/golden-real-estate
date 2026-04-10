@@ -21,17 +21,20 @@ export default function AdminUsersPage() {
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
 
-  async function fetchUsers() {
-    const res = await fetch("/api/admin/users");
-    if (res.ok) {
-      const data = await res.json();
-      setUsers(data);
-    }
-    setLoading(false);
-  }
-
   useEffect(() => {
-    fetchUsers();
+    let cancelled = false;
+    fetch("/api/admin/users")
+      .then((res) => res.ok ? res.json() : Promise.reject())
+      .then((data) => {
+        if (!cancelled) {
+          setUsers(data);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
   }, []);
 
   async function handleCreate(e: React.FormEvent) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import ContactTable from "@/components/admin/ContactTable";
 import type { ContactRequest } from "@/types";
 
@@ -13,21 +13,23 @@ export default function AdminContactsPage() {
 
   const limit = 20;
 
-  const fetchContacts = useCallback(async () => {
-    setLoading(true);
+  useEffect(() => {
+    let cancelled = false;
     const params = new URLSearchParams({ page: String(page), limit: String(limit) });
     if (filter !== "") params.set("isRead", filter);
 
-    const res = await fetch(`/api/admin/contacts?${params}`);
-    const json = await res.json();
-    setContacts(json.data ?? []);
-    setTotal(json.total ?? 0);
-    setLoading(false);
-  }, [page, filter]);
+    fetch(`/api/admin/contacts?${params}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (!cancelled) {
+          setContacts(json.data ?? []);
+          setTotal(json.total ?? 0);
+          setLoading(false);
+        }
+      });
 
-  useEffect(() => {
-    fetchContacts();
-  }, [fetchContacts]);
+    return () => { cancelled = true; };
+  }, [page, filter]);
 
   async function handleMarkRead(id: string, isRead: boolean) {
     await fetch(`/api/admin/contacts/${id}`, {

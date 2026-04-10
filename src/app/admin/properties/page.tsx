@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import PropertyTable from "@/components/admin/PropertyTable";
 import type { Property } from "@/types";
 import { useSession } from "next-auth/react";
+import { CATEGORIES, PROPERTY_GROUPS } from "@/lib/constants";
 
 export default function AdminPropertiesPage() {
   const { data: session } = useSession();
@@ -13,29 +14,46 @@ export default function AdminPropertiesPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [category, setCategory] = useState("");
+  const [propertyGroup, setPropertyGroup] = useState("");
+  const [country, setCountry] = useState("");
+  const [countries, setCountries] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   const limit = 20;
 
-  const fetchProperties = useCallback(async () => {
-    setLoading(true);
+  // Fetch distinct countries for the dropdown
+  useEffect(() => {
+    fetch("/api/locations")
+      .then((res) => res.json())
+      .then((data) => setCountries(data.countries ?? []))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
     const params = new URLSearchParams({
       page: String(page),
       limit: String(limit),
     });
     if (search) params.set("q", search);
     if (status) params.set("status", status);
+    if (category) params.set("category", category);
+    if (propertyGroup) params.set("propertyGroup", propertyGroup);
+    if (country) params.set("country", country);
 
-    const res = await fetch(`/api/properties?${params}`);
-    const json = await res.json();
-    setProperties(json.data ?? []);
-    setTotal(json.total ?? 0);
-    setLoading(false);
-  }, [page, search, status]);
+    fetch(`/api/properties?${params}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (!cancelled) {
+          setProperties(json.data ?? []);
+          setTotal(json.total ?? 0);
+          setLoading(false);
+        }
+      });
 
-  useEffect(() => {
-    fetchProperties();
-  }, [fetchProperties]);
+    return () => { cancelled = true; };
+  }, [page, search, status, category, propertyGroup, country]);
 
   async function handleStatusChange(id: string, newStatus: string) {
     await fetch(`/api/properties/${id}/status`, {
@@ -85,13 +103,13 @@ export default function AdminPropertiesPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 mb-4">
+      <div className="flex flex-wrap gap-3 mb-4">
         <input
           type="text"
           placeholder="Search properties..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="border border-gray-200 rounded px-3 py-2 text-sm flex-1 max-w-xs focus:outline-none focus:ring-2 focus:ring-gray-300"
+          className="border border-gray-200 rounded px-3 py-2 text-sm flex-1 min-w-[180px] max-w-xs focus:outline-none focus:ring-2 focus:ring-gray-300"
         />
         <select
           value={status}
@@ -101,6 +119,36 @@ export default function AdminPropertiesPage() {
           <option value="">All statuses</option>
           {["ACTIVE", "PENDING", "SOLD", "UNDER_OFFER", "INACTIVE"].map((s) => (
             <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+        <select
+          value={category}
+          onChange={(e) => { setCategory(e.target.value); setPage(1); }}
+          className="border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+        >
+          <option value="">All categories</option>
+          {CATEGORIES.map((c) => (
+            <option key={c.value} value={c.value}>{c.label}</option>
+          ))}
+        </select>
+        <select
+          value={propertyGroup}
+          onChange={(e) => { setPropertyGroup(e.target.value); setPage(1); }}
+          className="border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+        >
+          <option value="">All groups</option>
+          {PROPERTY_GROUPS.map((g) => (
+            <option key={g.value} value={g.value}>{g.label}</option>
+          ))}
+        </select>
+        <select
+          value={country}
+          onChange={(e) => { setCountry(e.target.value); setPage(1); }}
+          className="border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+        >
+          <option value="">All countries</option>
+          {countries.map((c) => (
+            <option key={c} value={c}>{c}</option>
           ))}
         </select>
       </div>
