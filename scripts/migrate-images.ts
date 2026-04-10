@@ -2,7 +2,7 @@
  * Image migration: upload property images from local ApostropheCMS export to R2
  * and populate the `images[]` array on each property in MongoDB.
  *
- * Run: npx tsx scripts/migrate-images.ts [--dry-run] [--limit N] [--force]
+ * Run: npx tsx scripts/migrate-images.ts [--dry-run] [--db-only] [--limit N] [--force]
  *
  * Idempotent — skips properties that already have images (unless --force).
  * Re-runnable after interruption.
@@ -28,6 +28,7 @@ import mongoose from "mongoose";
 // ---------------------------------------------------------------------------
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes("--dry-run");
+const DB_ONLY = args.includes("--db-only");
 const FORCE = args.includes("--force");
 const limitIdx = args.indexOf("--limit");
 const LIMIT = limitIdx !== -1 ? parseInt(args[limitIdx + 1], 10) : 0;
@@ -78,7 +79,7 @@ async function main() {
   const { uploadToR2, getPublicUrl } = await import("../src/lib/r2");
 
   console.log("=== Image Migration ===");
-  console.log(`  Mode:  ${DRY_RUN ? "DRY RUN" : "LIVE"}`);
+  console.log(`  Mode:  ${DRY_RUN ? "DRY RUN" : DB_ONLY ? "DB-ONLY" : "LIVE"}`);
   console.log(`  Force: ${FORCE}`);
   console.log(`  Limit: ${LIMIT || "none"}`);
   console.log();
@@ -145,18 +146,10 @@ async function main() {
     let propertyFailed = false;
 
     for (const ref of imageRefs.sort((a, b) => a.order - b.order)) {
-      const localFile = resolveLocalFile(ref, fileIndex);
-
-      if (!localFile) {
-        totalSkippedNotFound++;
-        notFoundRefs.push(`${ref.attachmentId}-${ref.filename}.${ref.extension}`);
-        continue;
-      }
-
-      const contentType = CONTENT_TYPES[ref.extension] || "application/octet-stream";
       const r2Key = `properties/migrate-${ref.attachmentId}.${ref.extension}`;
 
-      if (DRY_RUN) {
+      if (DB_ONLY || DRY_RUN) {
+        // Skip local file check + upload — just construct the URL
         const url = getPublicUrl(r2Key);
         images.push({
           url,
@@ -167,6 +160,16 @@ async function main() {
         totalUploaded++;
         continue;
       }
+
+      const localFile = resolveLocalFile(ref, fileIndex);
+
+      if (!localFile) {
+        totalSkippedNotFound++;
+        notFoundRefs.push(`${ref.attachmentId}-${ref.filename}.${ref.extension}`);
+        continue;
+      }
+
+      const contentType = CONTENT_TYPES[ref.extension] || "application/octet-stream";
 
       // Live upload
       try {
@@ -224,7 +227,7 @@ async function main() {
     propertiesProcessed++;
     if (propertyFailed) propertiesFailed++;
 
-    const status = DRY_RUN ? "would upload" : "uploaded";
+    const status = DRY_RUN ? "would upload" : DB_ONLY ? "db-only" : "uploaded";
     console.log(`  [${propertiesProcessed}/${props.length}] ${prop.slug}: ${images.length} images ${status}`);
   }
 
@@ -234,7 +237,7 @@ async function main() {
   console.log("\n========================================");
   console.log("  IMAGE MIGRATION SUMMARY");
   console.log("========================================");
-  console.log(`  Mode:                ${DRY_RUN ? "DRY RUN" : "LIVE"}`);
+  console.log(`  Mode:                ${DRY_RUN ? "DRY RUN" : DB_ONLY ? "DB-ONLY" : "LIVE"}`);
   console.log(`  Properties processed: ${propertiesProcessed}`);
   console.log(`  Properties failed:    ${propertiesFailed}`);
   console.log(`  Images uploaded:      ${totalUploaded}`);

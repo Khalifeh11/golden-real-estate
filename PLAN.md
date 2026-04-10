@@ -454,40 +454,19 @@ Download all 6 tar files locally. Don't extract, just save. This is your backup.
 - ~~#11. Public Search & Filters — UX Overhaul~~ — Fixed: property group/type filters, beds/baths filters, features filter, text index search all working
 - ~~#12. Agent photoUrl Missing from Admin Form~~ — Fixed: added image upload to AgentForm (replaces URL input)
 - ~~#13. Agent Hard-Delete Instead of Soft-Delete~~ — Fixed: DELETE sets `trash: true`, unsets `agentId` on orphaned properties, GET filters trashed agents
+- ~~#5. Admin Dashboard ↔ Public Pages Alignment (Partial)~~ — Fixed: removed `imageRefs` dead code. `commission`/`latitude`/`longitude` kept in model for future use (maps, admin form)
+- ~~#10. Rent Period Not Tracked~~ — Fixed: added `rentPeriod` field (MONTHLY/YEARLY/null), admin form selector, `formatPrice()` shows "/mo" or "/yr"
+- ~~#14. Admin Trash & Restore System~~ — Fixed: soft-delete for properties + contacts, `/admin/trash` page with restore + permanent delete, Trash nav item in sidebar
+- ~~#15. Contact Management — No Delete or Archive~~ — Fixed: contacts support soft-delete as part of trash system, delete button added to ContactTable
+
+- ~~#16. District Filter Not Applied in API~~ — Fixed: added district param to GET /api/properties
 
 ### Open
 
-#### #5. Admin Dashboard ↔ Public Pages Alignment (Partial)
-Most admin↔public gaps have been fixed (features, agent photos, images). Remaining:
-- `imageRefs` is dead code (never populated by admin, never read by public) — cleanup candidate
-- `commission`, `latitude`, `longitude` exist in model but admin can't set and public doesn't display
+None. All known issues resolved.
 
-#### #10. Rent Period Not Tracked
-No dedicated field to distinguish monthly vs. annual rent. The old data embedded this in description text (e.g., "For Rent at 18,000 USD per year"). Currently `formatPrice()` hardcodes "/mo" for all FOR_RENT properties. Need to:
-- Add a `rentPeriod` field ("MONTHLY" | "YEARLY" | null) to the Property model, types, and validator
-- Add a rent period selector in the admin form (only shown when category is FOR_RENT)
-- Update `formatPrice()` to display "/mo" or "/yr" based on the field, or nothing when null
-- Leave existing listings untouched (null = no label shown)
-
-#### #14. Admin Trash & Restore System
-Soft-deleted agents currently vanish with no way to recover them. Need a trash system across all deletable entities:
-- Add `trash` field to Property model (Agent already has it)
-- Add `trash` field to ContactRequest model
-- Convert Property and Contact DELETE handlers to soft-delete
-- Build `/admin/trash` page with tabs (Properties / Agents / Contacts) showing trashed items
-- Actions per item: Restore (set `trash: false`) and Permanently Delete
-- Add "Trash" link to AdminSidebar
-
-Key files:
-- `src/models/Property.ts` — add `trash` field
-- `src/models/ContactRequest.ts` — add `trash` field
-- `src/app/api/properties/[id]/route.ts` — change DELETE to soft-delete
-- `src/app/api/admin/contacts/[id]/route.ts` — add DELETE handler
-- `src/app/admin/trash/page.tsx` — new page
-- `src/components/admin/AdminSidebar.tsx` — add nav item
-
-#### #15. Contact Management — No Delete or Archive
-Contact submissions accumulate with no way to remove or archive them. The admin can only toggle read/responded status. Related to #14 — contacts should support soft-delete as part of the trash system.
+### Deferred
+- `commission`, `latitude`, `longitude` — exist in Property model but admin can't set and public doesn't display. Will add when implementing maps (Phase 5).
 
 ---
 
