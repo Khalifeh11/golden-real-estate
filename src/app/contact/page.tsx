@@ -20,27 +20,35 @@ export const metadata: Metadata = {
 const CONTACT_DETAILS = [
   {
     icon: "phone_iphone",
-    label: "Inquiries",
-    value: "+961 1 234 567",
-    href: "tel:+9611234567",
+    label: "Landline",
+    value: "04 719 775",
+    href: "tel:+9614719775",
+  },
+  {
+    icon: "chat",
+    label: "WhatsApp / Mobile",
+    value: "78 91 96 96",
+    href: "https://wa.me/+96178919696",
   },
   {
     icon: "mail",
     label: "Email",
-    value: "info@goldenlandre.com",
-    href: "mailto:info@goldenlandre.com",
+    value: "info@goldenlandrealestate.net",
+    href: "mailto:info@goldenlandrealestate.net",
   },
   {
     icon: "schedule",
     label: "Office Hours",
-    value: "Mon — Fri: 09:00 - 18:00",
+    value: "Mon – Fri: 10 AM – 6 PM | Sat: 10 AM – 1 PM",
   },
 ];
 
 const OFFICES = [
-  { name: "Beirut Office", address: "Mar Mikhael, Heritage District, LBP" },
-  { name: "Limassol HQ", address: "Beach Road, Marina Tower 4, CYP" },
-  { name: "Athens Atelier", address: "Kolonaki Square, Elite Suites, GRC" },
+  {
+    name: "Jal El Dib Office",
+    address:
+      "Inner main road, Abou Jaoudeh Bldg. 7th floor (adjacent to Lina\u2019s Caf\u00e9, facing Mallah Center)",
+  },
 ];
 
 export default function ContactPage() {
@@ -65,9 +73,9 @@ export default function ContactPage() {
               Get in Touch
             </h1>
             <p className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-              We&rsquo;d love to hear from you. Reach out for a private
-              consultation or to explore our exclusive portfolio of
-              Mediterranean estates.
+              We&rsquo;d love to hear from you. Reach out for a consultation
+              or to explore our portfolio of properties across Lebanon,
+              Cyprus, and Greece.
             </p>
           </div>
         </section>
@@ -159,7 +167,7 @@ export default function ContactPage() {
                 specific investment criteria.
               </p>
               <a
-                href="https://wa.me/+96170123456"
+                href="https://wa.me/+96178919696"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-3 bg-primary-container text-on-primary-container px-12 py-5 rounded-lg font-display font-bold uppercase text-sm tracking-widest hover:bg-white hover:text-secondary transition-all"
