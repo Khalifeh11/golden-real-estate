@@ -3,6 +3,7 @@
 import dbConnect from "./mongodb";
 import ContactRequestModel from "@/models/ContactRequest";
 import { contactFormSchema } from "./validators";
+import { sendInquiryNotification } from "./email";
 
 export type InquiryFormState = {
   success: boolean;
@@ -44,6 +45,16 @@ export async function submitInquiry(
     propertySlug: result.data.propertySlug,
     subject: result.data.subject,
   });
+
+  // Fire-and-forget — don't block the user response on email delivery
+  sendInquiryNotification({
+    name: result.data.name,
+    email: result.data.email,
+    phone: result.data.phone,
+    message: result.data.message,
+    subject: result.data.subject,
+    propertySlug: result.data.propertySlug,
+  }).catch(() => {});
 
   return { success: true, message: "Your inquiry has been submitted successfully. We will get back to you shortly." };
 }
