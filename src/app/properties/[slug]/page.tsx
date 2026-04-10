@@ -7,6 +7,8 @@ import AgentCard from "@/components/AgentCard";
 import InquiryForm from "@/components/InquiryForm";
 import PropertyCard from "@/components/PropertyCard";
 import Navbar from "@/components/Navbar";
+import PropertyJsonLd from "@/components/seo/PropertyJsonLd";
+import BreadcrumbJsonLd from "@/components/seo/BreadcrumbJsonLd";
 import sanitizeHtml from "sanitize-html";
 
 function stripHtml(html: string): string {
@@ -67,8 +69,19 @@ export default async function PropertyDetailPage({ params }: Props) {
     .filter(Boolean)
     .join(", ");
 
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://goldenlandrealestate.net";
+
   return (
     <>
+      <PropertyJsonLd property={property} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: siteUrl },
+          { name: "Properties", url: `${siteUrl}/properties` },
+          { name: property.title, url: `${siteUrl}/properties/${property.slug}` },
+        ]}
+      />
       <Navbar />
       <main className="pt-24 pb-16 max-w-7xl mx-auto px-4 md:px-8">
       {/* Photo Gallery */}

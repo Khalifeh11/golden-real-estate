@@ -10,6 +10,12 @@ export const metadata: Metadata = {
   title: "Meet Our Advisors | Golden Land Real Estate",
   description:
     "Dedicated professionals guiding you to your perfect property with local expertise and editorial precision.",
+  openGraph: {
+    title: "Meet Our Advisors | Golden Land Real Estate",
+    description:
+      "Dedicated professionals guiding you to your perfect property with local expertise and editorial precision.",
+    url: "/agents",
+  },
 };
 
 export default async function AgentsPage() {

@@ -13,6 +13,12 @@ export const metadata: Metadata = {
   title: "Properties | Golden Land Real Estate",
   description:
     "Browse thousands of properties for sale and rent across Lebanon, Cyprus, Greece, and more. Apartments, villas, land, and commercial spaces.",
+  openGraph: {
+    title: "Properties | Golden Land Real Estate",
+    description:
+      "Browse thousands of properties for sale and rent across Lebanon, Cyprus, Greece, and more. Apartments, villas, land, and commercial spaces.",
+    url: "/properties",
+  },
 };
 
 export default async function PropertiesPage({
@@ -47,7 +53,18 @@ export default async function PropertiesPage({
 
         <div className="flex flex-col lg:flex-row gap-10 items-start w-full">
           {/* Sidebar */}
-          <Suspense>
+          <Suspense
+            fallback={
+              <aside className="w-full lg:w-[280px] bg-surface-container-low p-6 rounded-xl space-y-6">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="h-3 w-20 bg-surface-container-high rounded animate-pulse" />
+                    <div className="h-10 w-full bg-surface-container rounded-lg animate-pulse" />
+                  </div>
+                ))}
+              </aside>
+            }
+          >
             <PropertyFilters filterOptions={filterOptions} />
           </Suspense>
 
@@ -62,7 +79,11 @@ export default async function PropertiesPage({
                 </span>{" "}
                 properties
               </div>
-              <Suspense>
+              <Suspense
+                fallback={
+                  <div className="h-10 w-32 bg-surface-container-high rounded animate-pulse" />
+                }
+              >
                 <SortDropdown />
               </Suspense>
             </div>
@@ -92,7 +113,11 @@ export default async function PropertiesPage({
             )}
 
             {/* Pagination */}
-            <Suspense>
+            <Suspense
+              fallback={
+                <div className="h-10 w-48 mx-auto bg-surface-container-high rounded animate-pulse mt-12" />
+              }
+            >
               <Pagination
                 currentPage={result.page}
                 totalPages={result.totalPages}

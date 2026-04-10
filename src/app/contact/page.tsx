@@ -9,6 +9,12 @@ export const metadata: Metadata = {
   title: "Contact Us | Golden Land Real Estate",
   description:
     "Get in touch with Golden Land Real Estate for a private consultation or to explore our exclusive portfolio of Mediterranean properties in Lebanon, Cyprus, and Greece.",
+  openGraph: {
+    title: "Contact Us | Golden Land Real Estate",
+    description:
+      "Get in touch with Golden Land Real Estate for a private consultation or to explore our exclusive portfolio of Mediterranean properties in Lebanon, Cyprus, and Greece.",
+    url: "/contact",
+  },
 };
 
 const CONTACT_DETAILS = [

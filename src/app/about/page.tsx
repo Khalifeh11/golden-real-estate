@@ -9,6 +9,12 @@ export const metadata: Metadata = {
   title: "About Us | Golden Land Real Estate",
   description:
     "Golden Land Real Estate — a trusted Mediterranean property company since 2012. Discover our heritage, values, and the markets we serve.",
+  openGraph: {
+    title: "About Us | Golden Land Real Estate",
+    description:
+      "Golden Land Real Estate — a trusted Mediterranean property company since 2012. Discover our heritage, values, and the markets we serve.",
+    url: "/about",
+  },
 };
 
 const VALUES = [

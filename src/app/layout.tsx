@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Manrope } from "next/font/google";
 import Providers from "@/components/Providers";
+import ToasterProvider from "@/components/ToasterProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -14,6 +15,9 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://goldenlandrealestate.net",
+  ),
   title: "Golden Land Real Estate",
   description:
     "Discover premium properties across Lebanon, Cyprus, and Greece. Golden Land Real Estate — your trusted partner in finding the perfect home.",
@@ -37,6 +41,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col font-body text-on-surface bg-surface">
         <Providers>{children}</Providers>
+        <ToasterProvider />
       </body>
     </html>
   );

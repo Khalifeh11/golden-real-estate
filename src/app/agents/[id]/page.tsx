@@ -7,6 +7,8 @@ import PropertyCard from "@/components/PropertyCard";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import AgentJsonLd from "@/components/seo/AgentJsonLd";
+import BreadcrumbJsonLd from "@/components/seo/BreadcrumbJsonLd";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -62,8 +64,19 @@ export default async function AgentProfilePage({ params }: Props) {
   const properties = await getPropertiesByAgentId(agent._id);
   const fullName = agentFullName(agent.firstName, agent.lastName);
 
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://goldenlandrealestate.net";
+
   return (
     <>
+      <AgentJsonLd agent={agent} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: siteUrl },
+          { name: "Our Advisors", url: `${siteUrl}/agents` },
+          { name: fullName, url: `${siteUrl}/agents/${agent._id}` },
+        ]}
+      />
       <Navbar />
       <main>
         {/* Agent Profile Header */}

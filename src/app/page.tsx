@@ -6,11 +6,15 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import PropertyCard from "@/components/PropertyCard";
 import { getFeaturedProperties } from "@/lib/properties";
+import OrganizationJsonLd from "@/components/seo/OrganizationJsonLd";
+import WebSiteJsonLd from "@/components/seo/WebSiteJsonLd";
 
 export default async function Home() {
   const featuredProperties = await getFeaturedProperties();
   return (
     <>
+      <OrganizationJsonLd />
+      <WebSiteJsonLd />
       <div className="flex flex-col h-screen">
       <Navbar />
 
