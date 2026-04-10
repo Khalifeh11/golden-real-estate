@@ -145,10 +145,21 @@ export async function getAgents(): Promise<Agent[]> {
   return docs as unknown as Agent[];
 }
 
-export async function getAgentById(agentId: string): Promise<Agent | null> {
+async function _getAgentById(agentId: string): Promise<Agent | null> {
   await dbConnect();
-  const doc = await AgentModel.findById(agentId).lean();
+  const doc = await AgentModel.findOne({ _id: agentId, trash: { $ne: true } }).lean();
   return (doc as unknown as Agent) ?? null;
+}
+
+/** Request-level cached version — safe to call from generateMetadata + page */
+export const getAgentById = cache(_getAgentById);
+
+export async function getPropertiesByAgentId(agentId: string): Promise<PropertyCardData[]> {
+  await dbConnect();
+  const docs = await PropertyModel.find({ agentId, status: "ACTIVE" })
+    .sort({ createdAt: -1 })
+    .lean();
+  return (docs as unknown as Property[]).map(toPropertyCardData);
 }
 
 export async function getSimilarProperties(

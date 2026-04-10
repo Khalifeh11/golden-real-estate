@@ -1,9 +1,12 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { Agent } from "@/types";
 import { agentFullName } from "@/lib/utils";
 
 interface AgentCardProps {
   agent: Agent;
+  /** When true, the card header links to the agent profile page */
+  linkToProfile?: boolean;
 }
 
 function AgentInitials({ agent }: { agent: Agent }) {
@@ -20,30 +23,42 @@ function formatWhatsAppUrl(phone: string) {
   return `https://wa.me/${digits.replace("+", "")}`;
 }
 
-export default function AgentCard({ agent }: AgentCardProps) {
+export default function AgentCard({ agent, linkToProfile }: AgentCardProps) {
+  const fullName = agentFullName(agent.firstName, agent.lastName);
+
+  const header = (
+    <div className="flex items-center gap-4 mb-6">
+      {agent.photoUrl ? (
+        <Image
+          src={agent.photoUrl}
+          alt={fullName}
+          width={80}
+          height={80}
+          className="w-20 h-20 rounded-full object-cover"
+        />
+      ) : (
+        <AgentInitials agent={agent} />
+      )}
+      <div>
+        <h3 className="font-display font-bold text-xl">
+          {fullName}
+        </h3>
+        <p className="text-primary-container text-sm uppercase tracking-wide">
+          Property Advisor
+        </p>
+      </div>
+    </div>
+  );
+
   return (
     <div className="bg-surface-container-lowest p-8 rounded-xl shadow-xl shadow-black/5 border border-outline-variant/10">
-      <div className="flex items-center gap-4 mb-6">
-        {agent.photoUrl ? (
-          <Image
-            src={agent.photoUrl}
-            alt={agentFullName(agent.firstName, agent.lastName)}
-            width={80}
-            height={80}
-            className="w-20 h-20 rounded-full object-cover"
-          />
-        ) : (
-          <AgentInitials agent={agent} />
-        )}
-        <div>
-          <h3 className="font-display font-bold text-xl">
-            {agentFullName(agent.firstName, agent.lastName)}
-          </h3>
-          <p className="text-primary-container text-sm uppercase tracking-wide">
-            Property Advisor
-          </p>
-        </div>
-      </div>
+      {linkToProfile ? (
+        <Link href={`/agents/${agent._id}`} className="block hover:opacity-80 transition-opacity">
+          {header}
+        </Link>
+      ) : (
+        header
+      )}
 
       {agent.bio && (
         <p className="text-on-surface-variant text-sm mb-8 leading-relaxed">
