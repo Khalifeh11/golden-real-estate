@@ -185,8 +185,8 @@ export default function PropertyFilters({ filterOptions }: PropertyFiltersProps)
         <label className="block text-xs font-bold text-outline uppercase tracking-widest mb-3">
           Property Group
         </label>
-        <div className="grid grid-cols-3 gap-2">
-          {PROPERTY_GROUPS.map((group) => (
+        <div className="grid grid-cols-2 gap-2">
+          {PROPERTY_GROUPS.map((group, index) => (
             <button
               key={group.value}
               onClick={() =>
@@ -196,10 +196,11 @@ export default function PropertyFilters({ filterOptions }: PropertyFiltersProps)
                 })
               }
               className={cn(
-                "py-2 px-2 text-xs font-semibold rounded-lg border-none transition-colors",
+                "py-2 px-2 text-xs font-semibold rounded-lg border-none transition-colors cursor-pointer",
                 activePropertyGroup === group.value
                   ? "bg-primary-container text-on-primary-container shadow-sm"
-                  : "bg-surface text-secondary hover:bg-surface-variant"
+                  : "bg-surface text-secondary hover:bg-surface-variant",
+                index === PROPERTY_GROUPS.length - 1 && PROPERTY_GROUPS.length % 2 !== 0 && "col-span-2"
               )}
             >
               {group.label}
