@@ -71,7 +71,7 @@ export default function AgentForm({ agent, onSave, onCancel }: AgentFormProps) {
           <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
           <input
             required
-            value={form.firstName}
+            value={form.firstName || ""}
             onChange={(e) => set("firstName", e.target.value)}
             className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
           />
@@ -80,7 +80,7 @@ export default function AgentForm({ agent, onSave, onCancel }: AgentFormProps) {
           <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
           <input
             required
-            value={form.lastName}
+            value={form.lastName || ""}
             onChange={(e) => set("lastName", e.target.value)}
             className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
           />
@@ -91,7 +91,7 @@ export default function AgentForm({ agent, onSave, onCancel }: AgentFormProps) {
           <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
           <input
             type="email"
-            value={form.email}
+            value={form.email || ""}
             onChange={(e) => set("email", e.target.value)}
             className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
           />
@@ -99,7 +99,7 @@ export default function AgentForm({ agent, onSave, onCancel }: AgentFormProps) {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
           <input
-            value={form.phone}
+            value={form.phone || ""}
             onChange={(e) => set("phone", e.target.value)}
             className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
           />
@@ -155,7 +155,7 @@ export default function AgentForm({ agent, onSave, onCancel }: AgentFormProps) {
         <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
         <textarea
           rows={3}
-          value={form.bio}
+          value={form.bio || ""}
           onChange={(e) => set("bio", e.target.value)}
           className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 resize-y"
         />
