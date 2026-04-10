@@ -24,7 +24,7 @@ export async function searchProperties(
 
   await dbConnect();
 
-  const filter: Record<string, unknown> = { status: "ACTIVE" };
+  const filter: Record<string, unknown> = { status: "ACTIVE", trash: { $ne: true } };
 
   if (params.category) filter.category = params.category;
   if (params.propertyGroup) filter.propertyGroup = params.propertyGroup;
@@ -94,7 +94,7 @@ export async function getFilterOptions(context?: {
 }): Promise<FilterOptions> {
   await dbConnect();
 
-  const activeFilter: Record<string, string> = { status: "ACTIVE" };
+  const activeFilter: Record<string, unknown> = { status: "ACTIVE", trash: { $ne: true } };
   const cityFilter = { ...activeFilter };
   const districtFilter = { ...activeFilter };
 
@@ -118,7 +118,7 @@ export async function getFilterOptions(context?: {
 
 export async function getFeaturedProperties(limit = 6): Promise<PropertyCardData[]> {
   await dbConnect();
-  const docs = await PropertyModel.find({ status: "ACTIVE", isFeatured: true })
+  const docs = await PropertyModel.find({ status: "ACTIVE", trash: { $ne: true }, isFeatured: true })
     .sort({ createdAt: -1 })
     .limit(limit)
     .lean();
@@ -131,7 +131,7 @@ export async function getFeaturedProperties(limit = 6): Promise<PropertyCardData
 
 async function _getPropertyBySlug(slug: string): Promise<Property | null> {
   await dbConnect();
-  const doc = await PropertyModel.findOne({ slug, status: "ACTIVE" }).lean();
+  const doc = await PropertyModel.findOne({ slug, status: "ACTIVE", trash: { $ne: true } }).lean();
   return (doc as unknown as Property) ?? null;
 }
 
@@ -155,7 +155,7 @@ export const getAgentById = cache(_getAgentById);
 
 export async function getPropertiesByAgentId(agentId: string): Promise<PropertyCardData[]> {
   await dbConnect();
-  const docs = await PropertyModel.find({ agentId, status: "ACTIVE" })
+  const docs = await PropertyModel.find({ agentId, status: "ACTIVE", trash: { $ne: true } })
     .sort({ createdAt: -1 })
     .lean();
   return (docs as unknown as Property[]).map(toPropertyCardData);
@@ -167,7 +167,7 @@ export async function getSimilarProperties(
 ): Promise<PropertyCardData[]> {
   await dbConnect();
 
-  const baseFilter = { status: "ACTIVE", _id: { $ne: property._id } };
+  const baseFilter = { status: "ACTIVE", trash: { $ne: true }, _id: { $ne: property._id } };
   const results: Property[] = [];
 
   // Step 1: same district + category
