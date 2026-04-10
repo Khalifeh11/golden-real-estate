@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import Link from "next/link";
 import PropertyTable from "@/components/admin/PropertyTable";
 import type { Property } from "@/types";
@@ -56,25 +57,35 @@ export default function AdminPropertiesPage() {
   }, [page, search, status, category, propertyGroup, country]);
 
   async function handleStatusChange(id: string, newStatus: string) {
-    await fetch(`/api/properties/${id}/status`, {
+    const res = await fetch(`/api/properties/${id}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: newStatus }),
     });
-    setProperties((prev) =>
-      prev.map((p) => (p._id === id ? { ...p, status: newStatus as Property["status"] } : p))
-    );
+    if (res.ok) {
+      setProperties((prev) =>
+        prev.map((p) => (p._id === id ? { ...p, status: newStatus as Property["status"] } : p))
+      );
+      toast.success("Status updated");
+    } else {
+      toast.error("Failed to update status");
+    }
   }
 
   async function handleFeatureToggle(id: string, isFeatured: boolean) {
-    await fetch(`/api/properties/${id}/status`, {
+    const res = await fetch(`/api/properties/${id}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isFeatured }),
     });
-    setProperties((prev) =>
-      prev.map((p) => (p._id === id ? { ...p, isFeatured } : p))
-    );
+    if (res.ok) {
+      setProperties((prev) =>
+        prev.map((p) => (p._id === id ? { ...p, isFeatured } : p))
+      );
+      toast.success(isFeatured ? "Marked as featured" : "Removed from featured");
+    } else {
+      toast.error("Failed to update featured status");
+    }
   }
 
   async function handleDelete(id: string) {
@@ -82,6 +93,9 @@ export default function AdminPropertiesPage() {
     if (res.ok) {
       setProperties((prev) => prev.filter((p) => p._id !== id));
       setTotal((t) => t - 1);
+      toast.success("Property moved to trash");
+    } else {
+      toast.error("Failed to delete property");
     }
   }
 

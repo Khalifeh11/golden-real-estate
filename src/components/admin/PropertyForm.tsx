@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import type { PropertyCreateData } from "@/lib/validators";
 import type { Agent, PropertyImage } from "@/types";
 import {
@@ -27,7 +28,6 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
   const router = useRouter();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [images, setImages] = useState<PropertyImage[]>(defaultValues?.images ?? []);
-  const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [customFeature, setCustomFeature] = useState("");
 
@@ -76,7 +76,6 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
   async function onSubmit(raw: PropertyCreateData) {
     const data = cleanFormData(raw);
     setSaving(true);
-    setError("");
 
     const url = propertyId ? `/api/properties/${propertyId}` : "/api/properties";
     const method = propertyId ? "PUT" : "POST";
@@ -89,23 +88,18 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
 
     if (!res.ok) {
       const json = await res.json();
-      setError(json.error?.formErrors?.[0] ?? "Failed to save property.");
+      toast.error(json.error?.formErrors?.[0] ?? "Failed to save property.");
       setSaving(false);
       return;
     }
 
+    toast.success("Property saved successfully");
     router.push("/admin/properties");
     router.refresh();
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-3xl">
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded px-4 py-3 text-sm">
-          {error}
-        </div>
-      )}
-
       {/* Basic Info */}
       <section className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
         <h2 className="font-semibold text-gray-900">Basic Information</h2>

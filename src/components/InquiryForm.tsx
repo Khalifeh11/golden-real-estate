@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { toast } from "sonner";
 import { submitInquiry, type InquiryFormState } from "@/lib/actions";
 
 interface InquiryFormProps {
@@ -31,6 +32,11 @@ export default function InquiryForm({
   const resolvedSubject =
     subjectProp ?? (propertyTitle ? `Inquiry about ${propertyTitle}` : "General Inquiry");
   const [state, formAction, isPending] = useActionState(submitInquiry, initialState);
+
+  useEffect(() => {
+    if (state.success) toast.success("Inquiry submitted!");
+    else if (state.message && !state.success) toast.error(state.message);
+  }, [state]);
 
   if (state.success) {
     return (

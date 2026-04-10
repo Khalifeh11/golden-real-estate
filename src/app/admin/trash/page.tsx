@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface TrashedProperty {
   _id: string;
@@ -52,7 +53,12 @@ export default function AdminTrashPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type }),
     });
-    if (res.ok) removeItem(id, type);
+    if (res.ok) {
+      removeItem(id, type);
+      toast.success("Item restored");
+    } else {
+      toast.error("Failed to restore item");
+    }
   }
 
   async function handleDelete(id: string, type: string, label: string) {
@@ -60,7 +66,12 @@ export default function AdminTrashPage() {
     const res = await fetch(`/api/admin/trash/${id}?type=${type}`, {
       method: "DELETE",
     });
-    if (res.ok) removeItem(id, type);
+    if (res.ok) {
+      removeItem(id, type);
+      toast.success("Item permanently deleted");
+    } else {
+      toast.error("Failed to delete item");
+    }
   }
 
   function removeItem(id: string, type: string) {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import ContactTable from "@/components/admin/ContactTable";
 import type { ContactRequest } from "@/types";
 
@@ -32,21 +33,31 @@ export default function AdminContactsPage() {
   }, [page, filter]);
 
   async function handleMarkRead(id: string, isRead: boolean) {
-    await fetch(`/api/admin/contacts/${id}`, {
+    const res = await fetch(`/api/admin/contacts/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isRead }),
     });
-    setContacts((prev) => prev.map((c) => (c._id === id ? { ...c, isRead } : c)));
+    if (res.ok) {
+      setContacts((prev) => prev.map((c) => (c._id === id ? { ...c, isRead } : c)));
+      toast.success(isRead ? "Marked as read" : "Marked as unread");
+    } else {
+      toast.error("Failed to update contact");
+    }
   }
 
   async function handleMarkResponded(id: string, isResponded: boolean) {
-    await fetch(`/api/admin/contacts/${id}`, {
+    const res = await fetch(`/api/admin/contacts/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isResponded }),
     });
-    setContacts((prev) => prev.map((c) => (c._id === id ? { ...c, isResponded } : c)));
+    if (res.ok) {
+      setContacts((prev) => prev.map((c) => (c._id === id ? { ...c, isResponded } : c)));
+      toast.success(isResponded ? "Marked as responded" : "Marked as not responded");
+    } else {
+      toast.error("Failed to update contact");
+    }
   }
 
   async function handleDelete(id: string) {
@@ -54,6 +65,9 @@ export default function AdminContactsPage() {
     if (res.ok) {
       setContacts((prev) => prev.filter((c) => c._id !== id));
       setTotal((t) => t - 1);
+      toast.success("Contact moved to trash");
+    } else {
+      toast.error("Failed to delete contact");
     }
   }
 

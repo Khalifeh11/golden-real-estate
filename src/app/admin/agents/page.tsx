@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import AgentForm from "@/components/admin/AgentForm";
 import type { Agent } from "@/types";
 
@@ -33,6 +34,7 @@ export default function AdminAgentsPage() {
     const created = await res.json();
     setAgents((prev) => [created, ...prev]);
     setCreating(false);
+    toast.success("Agent created");
   }
 
   async function handleUpdate(data: Partial<Agent>) {
@@ -46,6 +48,7 @@ export default function AdminAgentsPage() {
     const updated = await res.json();
     setAgents((prev) => prev.map((a) => (a._id === updated._id ? updated : a)));
     setEditing(null);
+    toast.success("Agent updated");
   }
 
   async function handleDelete(id: string, name: string) {
@@ -53,6 +56,9 @@ export default function AdminAgentsPage() {
     const res = await fetch(`/api/agents/${id}`, { method: "DELETE" });
     if (res.ok) {
       setAgents((prev) => prev.filter((a) => a._id !== id));
+      toast.success("Agent moved to trash");
+    } else {
+      toast.error("Failed to delete agent");
     }
   }
 

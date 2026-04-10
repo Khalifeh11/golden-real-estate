@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import type { Agent } from "@/types";
 
 interface AgentFormProps {
@@ -19,7 +20,6 @@ export default function AgentForm({ agent, onSave, onCancel }: AgentFormProps) {
     bio: agent?.bio ?? "",
   });
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
 
   function set(field: keyof typeof form, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -28,11 +28,10 @@ export default function AgentForm({ agent, onSave, onCancel }: AgentFormProps) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    setError("");
     try {
       await onSave(form);
     } catch {
-      setError("Failed to save agent.");
+      toast.error("Failed to save agent.");
     } finally {
       setSaving(false);
     }
@@ -40,9 +39,6 @@ export default function AgentForm({ agent, onSave, onCancel }: AgentFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">{error}</p>
-      )}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
