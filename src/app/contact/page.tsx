@@ -21,13 +21,13 @@ const CONTACT_DETAILS = [
   {
     icon: "phone_iphone",
     label: "Landline",
-    value: "04 719 775",
+    value: "+961 4 719 775",
     href: "tel:+9614719775",
   },
   {
     icon: "chat",
     label: "WhatsApp / Mobile",
-    value: "78 91 96 96",
+    value: "+961 78 91 96 96",
     href: "https://wa.me/+96178919696",
   },
   {
