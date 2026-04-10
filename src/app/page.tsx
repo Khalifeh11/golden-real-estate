@@ -158,19 +158,19 @@ export default async function Home() {
               </h2>
             </div>
             <p className="text-secondary text-lg leading-relaxed opacity-90">
-              At Golden Land Real Estate, we believe every property represents
-              a meaningful chapter in our clients&apos; lives. With thousands of
-              listings across Lebanon, Greece, Cyprus, and beyond, we offer
-              one of the most comprehensive property portfolios in the
-              Mediterranean — from city apartments to seaside villas, land
-              to commercial spaces.
+              Since 2010, Golden Land Real Estate has stood out through its
+              personalized approach — taking the time to fully understand
+              each client&apos;s needs and match them with the right
+              opportunities. We combine local expertise with transparency
+              to make every step of buying or selling smooth, clear, and
+              stress-free.
             </p>
             <p className="text-secondary text-lg leading-relaxed opacity-90">
-              Our commitment to excellence ensures that every transaction is
-              handled with care and professionalism. Whether you are buying
-              your first apartment, investing in land, or searching for a
-              rental, our team of property advisors is here to guide you at
-              every step.
+              We serve a diverse clientele — local buyers, members of the
+              Lebanese diaspora, international investors, and expats — with
+              a comprehensive portfolio spanning Lebanon, Cyprus, and Greece.
+              Our aim is not just to close deals but to build lasting
+              relationships based on trust and results.
             </p>
             <div className="pt-6">
               <Link

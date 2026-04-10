@@ -8,39 +8,39 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About Us | Golden Land Real Estate",
   description:
-    "Golden Land Real Estate — a trusted Mediterranean property company since 2012. Discover our heritage, values, and the markets we serve.",
+    "Golden Land Real Estate — a trusted Mediterranean property company since 2010. Discover our heritage, values, and the markets we serve.",
   openGraph: {
     title: "About Us | Golden Land Real Estate",
     description:
-      "Golden Land Real Estate — a trusted Mediterranean property company since 2012. Discover our heritage, values, and the markets we serve.",
+      "Golden Land Real Estate — a trusted Mediterranean property company since 2010. Discover our heritage, values, and the markets we serve.",
     url: "/about",
   },
 };
 
 const VALUES = [
   {
-    icon: "workspace_premium",
-    title: "Uncompromising Excellence",
+    icon: "person_search",
+    title: "Personalized Approach",
     description:
-      "We hold ourselves to an architectural standard of perfection in every listing and interaction.",
+      "We take the time to fully understand each client\u2019s needs and match them with the right opportunities.",
   },
   {
     icon: "handshake",
     title: "Trust & Transparency",
     description:
-      "Integrity is the bedrock of our relationships, ensuring clarity from first inquiry to final key.",
+      "Integrity is at the heart of everything we do, ensuring clarity and honesty from first inquiry to final key.",
   },
   {
-    icon: "public",
-    title: "Global Perspective",
+    icon: "location_city",
+    title: "Local Expertise",
     description:
-      "Combining local expertise with an international network to bridge the world's finest markets.",
+      "Deep knowledge of the Lebanese and Mediterranean property markets, from neighborhoods and pricing to hidden opportunities.",
   },
   {
-    icon: "concierge",
-    title: "Bespoke Service",
+    icon: "diversity_3",
+    title: "Lasting Relationships",
     description:
-      "Every client's journey is tailored, reflecting their unique goals and circumstances.",
+      "Our aim is not just to close deals but to build long-term partnerships based on trust and results.",
   },
 ];
 
@@ -69,7 +69,7 @@ const MARKETS = [
 ];
 
 const STATS = [
-  { value: "14+", label: "Years of Expertise" },
+  { value: "16+", label: "Years of Expertise" },
   { value: "500+", label: "Properties Sold" },
   { value: "3", label: "Primary Markets" },
   { value: "200+", label: "Global Clients" },
@@ -97,7 +97,7 @@ export default function AboutPage() {
               Our Story
             </h1>
             <p className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-              A trusted Mediterranean property company since 2012.
+              A trusted Mediterranean property company since 2010.
             </p>
           </div>
         </section>
@@ -130,19 +130,22 @@ export default function AboutPage() {
               </div>
               <div className="space-y-6 text-on-surface-variant text-lg leading-relaxed">
                 <p>
-                  Founded in 2012, Golden Land Real Estate began with a clear
-                  mission: to make property search across the Mediterranean
-                  straightforward, transparent, and rewarding. Over the past
-                  decade, we have grown into one of the region&apos;s most
-                  comprehensive property platforms, serving buyers, renters,
-                  and investors alike.
+                  Golden Land Real Estate was founded in 2010 by Mr. Fuad
+                  Moubayed, who brought a decade of experience as a real
+                  estate consultant in Dubai back to Lebanon. After
+                  freelancing and building a strong client base, he partnered
+                  with Peter Martayan — a key client who shared his vision —
+                  and together they secured a location and took the leap to
+                  form the company.
                 </p>
                 <p>
-                  Our philosophy is rooted in deep local knowledge and honest
-                  guidance. We know these markets — the neighborhoods, the
-                  pricing, the opportunities — and we put that expertise to
-                  work for every client, whether they are searching for a
-                  family apartment or a commercial investment.
+                  Today, Mr. Fuad still leads the business with the same
+                  passion and dedication that started it all. Our philosophy
+                  is rooted in a personalized approach: we take the time to
+                  understand each client&apos;s needs and match them with the
+                  right opportunities, combining local expertise with
+                  transparency to make every step smooth, clear, and
+                  stress-free.
                 </p>
               </div>
             </div>
@@ -253,10 +256,10 @@ export default function AboutPage() {
                 </h2>
               </div>
               <p className="text-on-surface-variant text-lg leading-relaxed">
-                Our multilingual team of property advisors brings together
-                decades of experience in local markets, legal requirements,
-                and financial planning to guide you through every step of the
-                process.
+                Our team of property advisors serves a diverse clientele —
+                local buyers, members of the Lebanese diaspora, international
+                investors, and expats — guiding each through every step of
+                the process with care and professionalism.
               </p>
               <Link
                 href="/agents"
