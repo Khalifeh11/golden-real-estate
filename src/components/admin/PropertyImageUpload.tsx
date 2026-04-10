@@ -43,9 +43,9 @@ export default function PropertyImageUpload({ images, onChange }: PropertyImageU
         const { uploaded } = await res.json();
         const nextOrder = images.length;
         const newImages: PropertyImage[] = uploaded.map(
-          (u: { url: string }, i: number) => ({
+          (u: { url: string; thumbnailUrl?: string }, i: number) => ({
             url: u.url,
-            thumbnailUrl: u.url,
+            thumbnailUrl: u.thumbnailUrl ?? u.url,
             altText: "",
             order: nextOrder + i,
           })

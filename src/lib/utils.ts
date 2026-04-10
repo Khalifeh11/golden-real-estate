@@ -63,7 +63,7 @@ export function toPropertyCardData(property: Property): PropertyCardData {
     bedrooms: property.bedrooms,
     bathrooms: property.bathrooms,
     referenceNumber: property.referenceNumber,
-    image: primaryImage?.url ?? "/placeholder-property.svg",
+    image: (primaryImage?.thumbnailUrl || primaryImage?.url) ?? "/placeholder-property.svg",
   };
 }
 
@@ -110,7 +110,7 @@ export function toPropertyListingCardData(property: Property): PropertyListingCa
     bedrooms: property.bedrooms,
     bathrooms: property.bathrooms,
     referenceNumber: property.referenceNumber,
-    image: sorted[0]?.url ?? "/placeholder-property.svg",
+    image: (sorted[0]?.thumbnailUrl || sorted[0]?.url) ?? "/placeholder-property.svg",
     country: property.country,
     city: property.city,
     district: property.district,

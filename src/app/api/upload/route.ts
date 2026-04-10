@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { uploadToR2 } from "@/lib/r2";
+import { generateThumbnail } from "@/lib/image";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No files provided" }, { status: 400 });
   }
 
-  const results: { url: string; key: string }[] = [];
+  const results: { url: string; thumbnailUrl: string; key: string; thumbnailKey: string }[] = [];
 
   for (const file of files) {
     if (!ALLOWED_TYPES.includes(file.type)) {
@@ -42,7 +43,12 @@ export async function POST(request: NextRequest) {
 
     try {
       const url = await uploadToR2(buffer, key, file.type);
-      results.push({ url, key });
+
+      const thumbBuffer = await generateThumbnail(buffer);
+      const thumbKey = `properties/thumbs/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
+      const thumbnailUrl = await uploadToR2(thumbBuffer, thumbKey, "image/webp");
+
+      results.push({ url, thumbnailUrl, key, thumbnailKey: thumbKey });
     } catch (err) {
       console.error("R2 upload error:", err);
       return NextResponse.json(
