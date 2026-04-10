@@ -7,7 +7,7 @@ import AgentCard from "@/components/AgentCard";
 import InquiryForm from "@/components/InquiryForm";
 import PropertyCard from "@/components/PropertyCard";
 import Navbar from "@/components/Navbar";
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 
 function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, "");
@@ -190,7 +190,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               <div
                 className="prose prose-lg max-w-none text-on-surface-variant"
                 dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(property.description),
+                  __html: sanitizeHtml(property.description),
                 }}
               />
             </section>
