@@ -8,7 +8,10 @@
 
 import mongoose from "mongoose";
 
-const MONGODB_URI = "mongodb://localhost:27017/goldenland-real-estate";
+const MONGODB_URI = process.env.MONGODB_URI;
+if (!MONGODB_URI) {
+  throw new Error("MONGODB_URI not set — refuse to run destructive migration without explicit target");
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -296,9 +299,9 @@ async function main() {
   const BATCH_SIZE = 1000;
   let batch: Record<string, unknown>[] = [];
   let insertedCount = 0;
-  let unclassifiedTitles: string[] = [];
+  const unclassifiedTitles: string[] = [];
   let nullCountryCount = 0;
-  let statusDistribution: Record<string, number> = {};
+  const statusDistribution: Record<string, number> = {};
 
   for await (const doc of propertyCursor) {
     // Derive category + status
