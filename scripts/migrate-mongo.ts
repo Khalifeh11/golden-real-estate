@@ -216,7 +216,7 @@ function resolveImageRefs(
 
 async function main() {
   console.log("Connecting to MongoDB...");
-  await mongoose.connect(MONGODB_URI);
+  await mongoose.connect(MONGODB_URI!);
   const db = mongoose.connection.db!;
 
   // -----------------------------------------------------------------------
