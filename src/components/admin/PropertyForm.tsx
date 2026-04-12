@@ -68,7 +68,7 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
       }
     }
     if (!cleaned.agentId) {
-      cleaned.agentId = undefined;
+      cleaned.agentId = null;
     }
     return cleaned;
   }

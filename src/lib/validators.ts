@@ -71,7 +71,7 @@ export const propertyCreateSchema = z.object({
   yearBuilt: z.number().min(1800).max(new Date().getFullYear()).optional(),
   view: z.string().optional(),
   features: z.array(z.string()).default([]),
-  agentId: z.string().optional(),
+  agentId: z.string().nullable().optional(),
   isFeatured: z.boolean().default(false),
   images: z
     .array(
