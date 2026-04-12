@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golden Land Real Estate — Coming Soon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00b4d8;
+    --cyan-dark: #0096b7;
+    --slate: #2b3a4a;
+    --slate-light: #3d5168;
+    --silver: #b8c4ce;
+    --offwhite: #f4f6f8;
+    --white: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--offwhite);
+    color: var(--slate);
+    overflow-x: hidden;
+  }
+
+  /* Subtle animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+      radial-gradient(ellipse at 20% 50%, rgba(0, 180, 216, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(0, 150, 183, 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 80%, rgba(43, 58, 74, 0.03) 0%, transparent 50%);
+    animation: drift 20s ease-in-out infinite;
+    z-index: 0;
+  }
+
+  @keyframes drift {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(2%, -1%) rotate(1deg); }
+    66% { transform: translate(-1%, 1%) rotate(-0.5deg); }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 2rem;
+    max-width: 680px;
+    width: 100%;
+  }
+
+  .logo-wrapper {
+    margin-bottom: 2.5rem;
+    animation: fadeUp 1s ease-out;
+  }
+
+  .logo-wrapper img {
+    width: 220px;
+    height: auto;
+    filter: drop-shadow(0 4px 20px rgba(0, 180, 216, 0.12));
+  }
+
+  .divider {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--cyan-dark));
+    margin: 0 auto 2rem;
+    border-radius: 2px;
+    animation: fadeUp 1s ease-out 0.2s both;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 2.4rem;
+    letter-spacing: 0.02em;
+    color: var(--slate);
+    margin-bottom: 0.75rem;
+    animation: fadeUp 1s ease-out 0.3s both;
+  }
+
+  .subtitle {
+    font-weight: 300;
+    font-size: 1.1rem;
+    color: var(--slate-light);
+    margin-bottom: 3rem;
+    line-height: 1.6;
+    animation: fadeUp 1s ease-out 0.4s both;
+  }
+
+  .contact-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    box-shadow: 
+      0 1px 3px rgba(0, 0, 0, 0.04),
+      0 8px 30px rgba(0, 0, 0, 0.06);
+    text-align: left;
+    animation: fadeUp 1s ease-out 0.5s both;
+    border: 1px solid rgba(0, 180, 216, 0.08);
+  }
+
+  .contact-card h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--cyan);
+    margin-bottom: 1.25rem;
+  }
+
+  .contact-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--slate-light);
+  }
+
+  .contact-row:last-child { margin-bottom: 0; }
+
+  .contact-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    color: var(--cyan);
+  }
+
+  .contact-row a {
+    color: var(--slate-light);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .contact-row a:hover {
+    color: var(--cyan);
+  }
+
+  .phone-numbers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    margin-top: 3rem;
+    padding-bottom: 2rem;
+    font-size: 0.8rem;
+    color: var(--silver);
+    letter-spacing: 0.03em;
+    animation: fadeUp 1s ease-out 0.7s both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 480px) {
+    .container { padding: 1.5rem; }
+    h1 { font-size: 1.8rem; }
+    .logo-wrapper img { width: 170px; }
+    .contact-card { padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="logo-wrapper">
+    <img src="/logo.jpeg" alt="Golden Land Real Estate">
+  </div>
+
+  <div class="divider"></div>
+
+  <h1>Something New Is Coming</h1>
+  <p class="subtitle">We're building a brand new experience.<br>In the meantime, get in touch with us directly.</p>
+
+  <div class="contact-card">
+    <h2>Contact Us</h2>
+
+    <div class="contact-row">
+      <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span>Jal el Dib inside road, facing Mallah center, Lina's Cafe adjacent building, Abou Jaoudeh building 7th floor, Lebanon</span>
+    </div>
+
+    <div class="contact-row">
+      <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <div class="phone-numbers">
+        <a href="tel:+9614719775">+961 4 719775</a>
+        <a href="tel:+96178919696">+961 78 919696</a>
+        <a href="tel:+9614719774">+961 4 719774</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>&copy; 2026 Golden Land Real Estate. All rights reserved.</footer>
+
+</body>
+</html>
