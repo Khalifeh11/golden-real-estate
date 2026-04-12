@@ -66,26 +66,6 @@ export default function Footer() {
           </Link>
         </div>
       </div>
-
-      {/* Newsletter */}
-      <div className="mt-10 md:mt-0 flex flex-col items-start md:items-end">
-        <span className="text-primary-container font-semibold uppercase tracking-widest text-[10px] mb-4">
-          Newsletter
-        </span>
-        <form className="flex">
-          <input
-            type="email"
-            placeholder="Your Email"
-            className="bg-white/5 border border-white/10 rounded-l-lg px-4 py-2 text-white focus:outline-none focus:border-primary-container w-full md:w-64"
-          />
-          <button
-            type="submit"
-            className="bg-primary-container text-on-primary-container px-4 py-2 rounded-r-lg font-bold hover:bg-white transition-colors"
-          >
-            Join
-          </button>
-        </form>
-      </div>
     </footer>
   );
 }
