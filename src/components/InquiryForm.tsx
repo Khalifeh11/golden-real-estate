@@ -58,7 +58,7 @@ export default function InquiryForm({
   }
 
   const inputClasses =
-    "w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant/20 focus:border-primary-container focus:ring-0 px-0 py-2 transition-all text-on-surface placeholder:text-outline";
+    "w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant/20 focus:border-primary-container focus:ring-0 px-3 py-2 transition-all text-on-surface placeholder:text-outline";
 
   return (
     <div className="bg-surface-container-low p-8 rounded-xl border border-outline-variant/10">
