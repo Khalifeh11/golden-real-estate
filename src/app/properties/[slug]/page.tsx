@@ -7,6 +7,7 @@ import AgentCard from "@/components/AgentCard";
 import InquiryForm from "@/components/InquiryForm";
 import PropertyCard from "@/components/PropertyCard";
 import Navbar from "@/components/Navbar";
+import ScrollToTop from "@/components/ScrollToTop";
 import PropertyJsonLd from "@/components/seo/PropertyJsonLd";
 import BreadcrumbJsonLd from "@/components/seo/BreadcrumbJsonLd";
 import sanitizeHtml from "sanitize-html";
@@ -74,6 +75,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 
   return (
     <>
+      <ScrollToTop key={property.slug} />
       <PropertyJsonLd property={property} />
       <BreadcrumbJsonLd
         items={[
