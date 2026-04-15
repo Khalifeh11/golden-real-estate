@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { MdMenu, MdClose } from "react-icons/md";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -42,9 +43,7 @@ export default function Navbar() {
         className="md:hidden text-primary-container"
         aria-label="Toggle navigation menu"
       >
-        <span className="material-symbols-outlined">
-          {mobileOpen ? "close" : "menu"}
-        </span>
+        {mobileOpen ? <MdClose size={24} /> : <MdMenu size={24} />}
       </button>
 
       {/* Mobile drawer */}

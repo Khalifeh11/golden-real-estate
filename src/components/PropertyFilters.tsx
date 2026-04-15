@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useState, useEffect, useTransition } from "react";
 import * as Slider from "@radix-ui/react-slider";
+import { MdFilterList } from "react-icons/md";
 import { CATEGORIES, PROPERTY_GROUPS, PROPERTY_TYPES, ALL_PROPERTY_TYPES, getSliderConfig } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { FilterOptions, PropertyGroup } from "@/types";
@@ -133,7 +134,7 @@ export default function PropertyFilters({ filterOptions }: PropertyFiltersProps)
       {/* Header */}
       <div>
         <h3 className="font-display text-lg font-bold text-secondary mb-4 flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary text-sm">filter_list</span>
+          <MdFilterList className="text-primary w-4 h-4" />
           Search Filters
         </h3>
 
