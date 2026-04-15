@@ -49,22 +49,19 @@ const MARKETS = [
     name: "Lebanon",
     description:
       "Our largest market, with thousands of properties across Matn, Keserwan, Beirut, and dozens of other regions — from apartments and land to villas and commercial spaces.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuC6QB9aivyBiLgS0I97gyRCcBVfFRw2tqJkWPzJoS0Y92NtXFH2uY8On3e8hgkN1623yb1CkU0NeqYd8oJ5UGfZiCF4ZN1RnieR0Dyl3rJgXPe_7fBjusQCFj6F50VAqc_FRN4E14oTtFWsYixtUeWftUYSM0JixENl3kYczU77VsPGLnHdM7hF2kdfq02EoMI78Bc37EILrVsRpm2HAcODZYNY-cQ-5PZC-w0qEGw3rXF8I2rw0P2A_DnmLtd5AKk9reGeoffDUEt6",
+    image: "/lebanon.jpg",
   },
   {
     name: "Cyprus",
     description:
       "A growing portfolio of residential and investment properties across the island, from coastal apartments to inland developments.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBMDEa-3x9LPhbql7tlI_O2WJffkSZlxCeg6uIOOX6QUhSdJD2T6uRahOFEQerOxO2Y3xz8aiyA_z3spiGoHGHrFMqpLhVKN2o9Bky7vaaUugiU3M7cnR-KlX7uhMg4BAQxn_sv-KBtuy5_J97aJmAYHS_DSz4JmGNEswiYHz9t3jxxkhJWhR3ylhMrl4R86dWmnzrN3N4OVtbI4V08nv60TFs20OY48dLDfu53ptTN5-s5oooCC9i_7yNxbNnBUDSXjZkW9Y_vF2k0",
+    image: "/cyprus.jpg",
   },
   {
     name: "Greece",
     description:
       "A diverse selection of properties centered on Athens and the surrounding regions, with opportunities across the mainland and islands.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCtE_ChBwtnwnXt3TydzlP0J6oeKTt_ev6j1CzR2UrysDFG30yVO7505Hlywyj5wAZWdBzRKHF_SZ0nxoIlZ9_jboGZPGDh21J_8eq_65VvsE1zky5T0agw2bKXeCTQhjFigerH7yTDcnXM37YQy2m0VfCBIa0GfbLbk1lvXevGhKJxit_goUyiviiErouHUxSq5_HjOloh84JfKOOEtgAb67Oe8z58EHcMa1-goAfotc8eduHIUIqeWj2810NNHTkcUFWYZ4ds4E9h",
+    image: "/greece.jpg",
   },
 ];
 
@@ -245,22 +242,22 @@ export default function AboutPage() {
 
         {/* Meet the Team CTA */}
         <section className="py-24 md:py-32 bg-surface-container-low">
-          <div className="max-w-[1280px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8 order-2 lg:order-1">
-              <div>
-                <span className="text-primary font-bold tracking-[0.2em] text-xs uppercase mb-3 block">
-                  Our Advisors
-                </span>
-                <h2 className="font-display text-3xl md:text-5xl font-bold text-secondary tracking-tight">
-                  Meet the Experts Behind Your Journey
-                </h2>
-              </div>
-              <p className="text-on-surface-variant text-lg leading-relaxed">
-                Our team of property advisors serves a diverse clientele —
-                local buyers, members of the Lebanese diaspora, international
-                investors, and expats — guiding each through every step of
-                the process with care and professionalism.
-              </p>
+          <div className="max-w-3xl mx-auto px-6 text-center space-y-8">
+            <div>
+              <span className="text-primary font-bold tracking-[0.2em] text-xs uppercase mb-3 block">
+                Our Advisors
+              </span>
+              <h2 className="font-display text-3xl md:text-5xl font-bold text-secondary tracking-tight">
+                Meet the Experts Behind Your Journey
+              </h2>
+            </div>
+            <p className="text-on-surface-variant text-lg leading-relaxed">
+              Our team of property advisors serves a diverse clientele —
+              local buyers, members of the Lebanese diaspora, international
+              investors, and expats — guiding each through every step of
+              the process with care and professionalism.
+            </p>
+            <div className="pt-2">
               <Link
                 href="/agents"
                 className="inline-flex items-center gap-2 bg-primary-container text-on-primary-container px-8 py-4 rounded-lg font-display font-bold text-sm tracking-widest uppercase hover:bg-primary hover:text-on-primary transition-colors group"
@@ -270,17 +267,6 @@ export default function AboutPage() {
                   arrow_forward
                 </span>
               </Link>
-            </div>
-            <div className="order-1 lg:order-2">
-              <div className="relative aspect-[16/9] rounded-xl overflow-hidden shadow-xl">
-                <Image
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnWuYWeEG_a4Qhj9UcliPhD2ZTfxm9P8Wf_Bx7g6XNcuxRUHq_sh20pqq5EUy10bOLtw0NgEUlivKBdOFGW8P-ZqZRUOwODnCR3CroUO_nCDjr3OUYEN0ewbbxJFyZgvDl6hlXaoqnV0VvosVlZDGe523NJHH5DMxjFGyWrjzkh4CrU5_bt1xWRr90wKpQJwm9e3kxhBz_nWuyas0Q6Z1I_wnAh8HZ76QyoRTUmZbzkOJevfgmiJWx9Dj0_--BZO0FBe1OWWW6gA5i"
-                  alt="Golden Land Real Estate advisory team"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
-              </div>
             </div>
           </div>
         </section>
