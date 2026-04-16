@@ -60,8 +60,8 @@ export default function ContactPage() {
         <section className="relative flex-1 min-h-0 w-full flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
             <Image
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1qiaCkMR-xH1qK0UzNk5kJmBu5s06I-mBjgvDm2XQf9NcRM0KcGDkg4XHes6t11EAqivqnsPwVaDd9b1XyxGLO2wiaTdKXKAZPGKmKh3UACIpaUmiccrfHPgAk5SNXPHAo7jjQf5tjxHBhmD7a2RgTcRN-m0QLzjvy29tRXsKhF0tuCHd_pdiHmWlcw-glMDdbk4dJySo3liCcSMzIWVd1Ue_0UcjxhY9QBdXD0RgNcQ9tbfs6ennFmO_vpb7Op6f0lbM96U7yuMi"
-              alt="Amalfi coast with blue Mediterranean sea and pastel houses on cliffs"
+              src="/contact.jpg"
+              alt="Scenic Lebanese landscape"
               fill
               className="object-cover"
               priority
