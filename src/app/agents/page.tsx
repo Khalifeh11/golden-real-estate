@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -23,20 +24,33 @@ export default async function AgentsPage() {
 
   return (
     <>
-      <Navbar />
-      <main>
+      <div className="flex flex-col h-screen">
+        <Navbar />
         {/* Hero */}
-        <header className="py-24 md:py-32 px-6 text-center">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="font-display text-5xl md:text-[3.5rem] font-extrabold tracking-tight leading-tight mb-6">
+        <section className="relative flex-1 min-h-0 w-full flex items-center justify-center overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/agents1.jpg"
+              alt="Golden Land Real Estate team of advisors"
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-[rgba(44,62,74,0.7)]" />
+          </div>
+          <div className="relative z-10 text-center max-w-4xl px-6">
+            <h1 className="text-white font-display font-extrabold text-5xl md:text-7xl tracking-tight mb-6">
               Meet Our Advisors
             </h1>
-            <p className="text-xl text-on-surface-variant leading-relaxed max-w-2xl mx-auto">
+            <p className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
               Dedicated professionals guiding you to your perfect property with
               local expertise and editorial precision.
             </p>
           </div>
-        </header>
+        </section>
+      </div>
+
+      <main>
 
         {/* Agent Grid */}
         <section className="bg-surface-container-low py-20 px-6">
