@@ -51,7 +51,7 @@ export default function AgentCard({ agent, linkToProfile }: AgentCardProps) {
   );
 
   return (
-    <div className="bg-surface-container-lowest p-8 rounded-xl shadow-xl shadow-black/5 border border-outline-variant/10">
+    <div className="bg-surface-container-lowest p-8 rounded-xl shadow-xl shadow-black/5 border border-outline-variant/10 flex flex-col">
       {linkToProfile ? (
         <Link href={`/agents/${agent._id}`} className="block hover:opacity-80 transition-opacity">
           {header}
@@ -61,12 +61,12 @@ export default function AgentCard({ agent, linkToProfile }: AgentCardProps) {
       )}
 
       {agent.bio && (
-        <p className="text-on-surface-variant text-sm mb-8 leading-relaxed">
+        <p className="text-on-surface-variant text-sm leading-relaxed">
           {agent.bio}
         </p>
       )}
 
-      <div className="grid grid-cols-1 gap-3">
+      <div className="grid grid-cols-1 gap-3 mt-auto pt-8">
         {agent.phone && (
           <>
             <a
