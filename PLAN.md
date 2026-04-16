@@ -463,7 +463,43 @@ Download all 6 tar files locally. Don't extract, just save. This is your backup.
 
 ### Open
 
-None. All known issues resolved.
+#### #17. Image Optimization (R2 + Next.js Loading)
+Audit found the R2 pipeline itself is correct (original + 400px WebP thumb on upload, cards use `thumbnailUrl`). Issues are on the consumption/config side.
+
+**Tier 1 — Bug + Next.js 16 config (quick)**
+- **Bug**: `src/app/page.tsx:29` passes `preload` (not a valid `<Image>` prop) to the homepage hero instead of `priority`. The LCP image is being lazy-loaded. Fix: change to `priority` and add `sizes="100vw"`.
+- `next.config.ts` is minimal — missing Next.js 16-relevant settings. Add:
+  ```ts
+  formats: ["image/avif", "image/webp"],
+  minimumCacheTTL: 31536000,   // 1 year — R2 keys are immutable (timestamp + random)
+  qualities: [60, 75, 85],      // Next 16 default is [75] only; any other quality prop gets coerced
+  ```
+- Verify `priority` + `sizes` on all above-the-fold `<Image fill>` instances (about page hero is good; home heritage section at `src/app/page.tsx:139` should be spot-checked).
+
+**Tier 2 — Compress static `/public` JPEGs**
+Three uncompressed hero tiles served via `<Image>` on `/about`:
+- `public/lebanon.jpg` — 1.0 MB → target ~150 KB
+- `public/cyprus.jpg` — 896 KB → target ~150 KB
+- `public/greece.jpg` — 672 KB → target ~150 KB
+
+Run Sharp locally: resize to 1600px max width, `jpeg({ quality: 78, mozjpeg: true })`, overwrite the originals.
+
+**Tier 3 — Blur placeholders (optional, larger)**
+No images use `placeholder="blur"`. Proper fix requires:
+- Extending `src/app/api/upload/route.ts` + `src/lib/image.ts` to generate a ~10x10 base64 blur via Sharp at upload time.
+- Adding `blurDataURL: string` to `PropertyImage` in `src/models/Property.ts` and `src/types/index.ts`.
+- Backfilling existing images via a variant of `scripts/migrate-images.ts`.
+- Passing `placeholder="blur" blurDataURL={img.blurDataURL}` in `PropertyCard`, `PropertyListingCard`, `PropertyGallery`.
+
+Skip unless perceived loading on slow connections becomes a complaint.
+
+**Out of scope / flagged for later**
+- R2 public dev URL (`pub-7412235d264749c6974f82455f8bc7c1.r2.dev`) is Cloudflare's free dev URL with rate limits. For production scale, bind a custom domain to the bucket. Not urgent — Vercel's image optimizer caches transformed variants, so origin hits are rare.
+
+**Verification**
+- `npm run lint` clean.
+- DevTools → Network on `/`: hero fetches in the initial wave (no `loading="lazy"`), Content-Type `image/avif` in modern browsers.
+- Lighthouse LCP < 2.5s on Slow 4G for `/`, `/about`, `/properties`, and a property detail page.
 
 ### Deferred
 - `commission`, `latitude`, `longitude` — exist in Property model but admin can't set and public doesn't display. Will add when implementing maps (Phase 5).
