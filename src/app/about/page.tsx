@@ -81,8 +81,8 @@ export default function AboutPage() {
         <section className="relative flex-1 min-h-0 w-full flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
             <Image
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzKCoJq69WbnkMddm-xlkWesM9pEVOS5zABs6jppGngu0T07aSylWlVSxMvl9ab8xGLpOx9p-czAI9uAOzj7nZx_9XixwSMEZ0Yo6ywoVyGXBL7HURprD5yOT--h_7Nm_40zA73scjTkWJG3aSxBU9B-Dz82bgXT7M-6ftavrOlLvCOT9t73mZeI6A83rqVctfYMA4z7wg98RCii1ASeDN7MJx2Yb-WmXJoqJPMMQG0rYdYHmbTP2UCbx-kvls8r1zSMxZmcLeR-On"
-              alt="Mediterranean coastline with turquoise water"
+              src="/about-us.jpg"
+              alt="Lebanese mountain village overlooking a valley"
               fill
               className="object-cover"
               priority
