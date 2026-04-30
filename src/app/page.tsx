@@ -22,11 +22,12 @@ export default async function Home() {
       <section className="relative flex-1 min-h-0 w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5kpj27fJfrPYkvEUA4y7Ao4AAw-Pp0IuogltVTgr2V7xQC8jwMIqCIKqYuxmtfh3xYSGVd0b19zfoC4Caz8s1GYetOgjpg3p0bnA4hc6fRKNKSNO2WDhynPjzLetmRGTxB7gDkBLkFV9OHrfvOWteeRmbYSDGKTlFBAE2WPcE2bTcV_UJ7VvOVEC5fu8HjNEBu4ffEx3DPN8BsdRffQXNGJ5yLkhCIWPCeJFMAoijs2014Vj7PkT8j7Lax56mlKaRzrndegqyePv1"
+            src="/home-hero.jpg"
             alt="Luxury coastal villa with infinity pool at sunset"
             fill
+            priority
+            sizes="100vw"
             className="object-cover"
-            preload
           />
           <div className="absolute inset-0 bg-[rgba(44,62,74,0.7)]" />
         </div>
@@ -154,23 +155,22 @@ export default async function Home() {
                 Our Heritage
               </span>
               <h2 className="font-display text-4xl md:text-5xl font-bold text-secondary leading-tight">
-                Mediterranean Real Estate, Redefined
+                Your Trusted Real Estate Partner
               </h2>
             </div>
             <p className="text-secondary text-lg leading-relaxed opacity-90">
-              Since 2010, Golden Land Real Estate has stood out through its
-              personalized approach — taking the time to fully understand
-              each client&apos;s needs and match them with the right
-              opportunities. We combine local expertise with transparency
-              to make every step of buying or selling smooth, clear, and
-              stress-free.
+              Since 2010, Golden Land Real Estate has been dedicated to
+              guiding clients through buying and selling properties with a
+              personalized and transparent approach.
             </p>
             <p className="text-secondary text-lg leading-relaxed opacity-90">
-              We serve a diverse clientele — local buyers, members of the
-              Lebanese diaspora, international investors, and expats — with
-              a comprehensive portfolio spanning Lebanon, Cyprus, and Greece.
-              Our aim is not just to close deals but to build lasting
-              relationships based on trust and results.
+              We proudly serve local buyers, Lebanese expatriates, and
+              international investors, offering a diverse portfolio of
+              properties across Lebanon, Cyprus, Greece, and Georgia.
+            </p>
+            <p className="text-secondary text-lg leading-relaxed opacity-90">
+              Our focus is simple: smooth transactions and long-term
+              relationships built on trust.
             </p>
             <div className="pt-6">
               <Link

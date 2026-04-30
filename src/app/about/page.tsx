@@ -122,27 +122,23 @@ export default function AboutPage() {
                   Our Heritage
                 </span>
                 <h2 className="font-display text-3xl md:text-5xl font-bold text-secondary tracking-tight">
-                  A Legacy of Mediterranean Expertise
+                  Our Story
                 </h2>
               </div>
               <div className="space-y-6 text-on-surface-variant text-lg leading-relaxed">
                 <p>
                   Golden Land Real Estate was founded in 2010 by Mr. Fuad
-                  Moubayed, who brought a decade of experience as a real
-                  estate consultant in Dubai back to Lebanon. After
-                  freelancing and building a strong client base, he partnered
-                  with Peter Martayan — a key client who shared his vision —
-                  and together they secured a location and took the leap to
-                  form the company.
+                  Moubayed, following years of experience in the real estate
+                  sector in Dubai, before returning to Lebanon to establish
+                  the company.
                 </p>
                 <p>
-                  Today, Mr. Fuad still leads the business with the same
-                  passion and dedication that started it all. Our philosophy
-                  is rooted in a personalized approach: we take the time to
-                  understand each client&apos;s needs and match them with the
-                  right opportunities, combining local expertise with
-                  transparency to make every step smooth, clear, and
-                  stress-free.
+                  Since then, he has guided the company with a clear and
+                  client-focused approach—taking the time to understand each
+                  client&apos;s needs, maintaining full transparency, and
+                  ensuring a smooth and seamless experience throughout every
+                  step of the journey. This approach continues to define how
+                  we work today.
                 </p>
               </div>
             </div>
