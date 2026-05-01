@@ -106,13 +106,13 @@ export default function AboutPage() {
           <div className="max-w-[1280px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <div className="relative">
               <div className="absolute -top-6 -left-6 w-3/4 h-3/4 bg-primary-container/20 rounded-xl -z-10" />
-              <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-2xl relative">
+              <div className="aspect-[4/5] max-h-[85vh] rounded-xl overflow-hidden shadow-2xl relative max-w-[80%] mx-auto">
                 <Image
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCL-z9mJ2jshS2cKEKRKkQhHUHFcz44SA0QAdZg3VYWCqgdUvdv75HAyMKtX1bcBN5J6D5_1-Bcf-WjJ-EfPzpOq4SblUhjIUJev0PflxO0J5TTbdSmILPpiBlLVvasUr5_o7ofVWtaSXB1u2YBb_3i-x1OWqHLB4ue4fGVGSjwU0J72MSO2bZXhfooaxUMyZWCsI6lLYa9C3z2Xu5mRtFZJ76yDa0N2lHTu3QQvyDw_J7qRgm1u64eeCIRa_cN7b0GHiEp0iSp5XJG"
-                  alt="Luxury modern interior with floor-to-ceiling windows"
+                  src="/our-story.jpg"
+                  alt="Fuad Moubayed, founder of Golden Land Real Estate"
                   fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover object-top"
+                  sizes="(max-width: 768px) 100vw, 40vw"
                 />
               </div>
             </div>
