@@ -65,6 +65,8 @@ export default async function PropertyDetailPage({ params }: Props) {
     (a, b) => a.order - b.order,
   );
   const features = property.features ?? [];
+  const hasTerrace = features.includes("Terrace");
+  const hasGarden = features.includes("Garden");
 
   const location = [property.district, property.city, property.country]
     .filter(Boolean)
@@ -127,7 +129,7 @@ export default async function PropertyDetailPage({ params }: Props) {
           </header>
 
           {/* Spec Bar */}
-          {(property.areaSqm != null || property.bedrooms != null || property.bathrooms != null || property.parkings != null) && (
+          {(property.areaSqm != null || property.bedrooms != null || property.bathrooms != null || property.parkings != null || hasTerrace || hasGarden) && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-surface-container-low rounded-xl mb-12 border border-outline-variant/10">
             {property.areaSqm != null && (
               <div className="flex flex-col items-center text-center p-2">
@@ -177,6 +179,34 @@ export default async function PropertyDetailPage({ params }: Props) {
                 </span>
               </div>
             )}
+            {hasTerrace && (
+              <div className="flex flex-col items-center text-center p-2">
+                <span
+                  className="material-symbols-outlined text-secondary mb-2"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  deck
+                </span>
+                <span className="text-xs uppercase text-outline tracking-wider">
+                  Terrace
+                </span>
+                <span className="font-display font-bold text-lg">Yes</span>
+              </div>
+            )}
+            {hasGarden && (
+              <div className="flex flex-col items-center text-center p-2">
+                <span
+                  className="material-symbols-outlined text-secondary mb-2"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  deck
+                </span>
+                <span className="text-xs uppercase text-outline tracking-wider">
+                  Garden
+                </span>
+                <span className="font-display font-bold text-lg">Yes</span>
+              </div>
+            )}
             {property.parkings != null && (
               <div className="flex flex-col items-center text-center p-2">
                 <span
@@ -189,7 +219,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                   Parking
                 </span>
                 <span className="font-display font-bold text-lg">
-                  {property.parkings} {property.parkings === 1 ? "Slot" : "Slots"}
+                  {property.parkings} 
                 </span>
               </div>
             )}
