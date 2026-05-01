@@ -73,7 +73,7 @@ export default function PropertyListingCard({ property }: PropertyListingCardPro
             <div className="text-2xl font-bold text-primary tracking-tight">
               {formattedPrice}
               {!isSale && (
-                <span className="text-sm font-normal text-outline"> /mo</span>
+                <span className="text-sm font-normal text-outline"> /month</span>
               )}
             </div>
           ) : (
@@ -81,49 +81,7 @@ export default function PropertyListingCard({ property }: PropertyListingCardPro
           )}
         </div>
 
-        {/* Stats grid */}
-        {hasStats && (
-          <div className="grid grid-cols-2 gap-y-3 mb-6 border-t border-surface-container-low pt-4">
-            {property.areaSqm != null && (
-              <div className="flex items-center gap-2 text-outline">
-                <span className="material-symbols-outlined text-sm">square_foot</span>
-                <span className="text-xs font-semibold">{property.areaSqm} sqm</span>
-              </div>
-            )}
-            {property.bedrooms != null && (
-              <div className="flex items-center gap-2 text-outline">
-                <span className="material-symbols-outlined text-sm">bed</span>
-                <span className="text-xs font-semibold">{property.bedrooms} Beds</span>
-              </div>
-            )}
-            {property.bathrooms != null && (
-              <div className="flex items-center gap-2 text-outline">
-                <span className="material-symbols-outlined text-sm">bathtub</span>
-                <span className="text-xs font-semibold">{property.bathrooms} Baths</span>
-              </div>
-            )}
-            {property.parkings != null && (
-              <div className="flex items-center gap-2 text-outline">
-                <span className="material-symbols-outlined text-sm">directions_car</span>
-                <span className="text-xs font-semibold">{property.parkings} Parking</span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Feature tags */}
-        {property.features.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-auto">
-            {property.features.map((feature) => (
-              <span
-                key={feature}
-                className="bg-surface-container-low text-secondary text-[10px] font-bold px-2 py-1 rounded"
-              >
-                {feature}
-              </span>
-            ))}
-          </div>
-        )}
+    
       </div>
     </Link>
   );
