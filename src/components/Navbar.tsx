@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { MdMenu, MdClose } from "react-icons/md";
 
@@ -19,8 +20,16 @@ export default function Navbar() {
     <nav className="bg-[#3D4F5F] flex justify-between items-center w-full px-8 py-4 sticky top-0 z-50 shadow-lg">
       <Link
         href="/"
-        className="text-xl font-bold text-white tracking-tighter font-display"
+        className="flex items-center gap-3 text-xl font-bold text-white tracking-tighter font-display"
       >
+        <Image
+          src="/logo.png"
+          alt="Golden Land Real Estate logo"
+          width={48}
+          height={32}
+          priority
+          className="h-8 w-auto"
+        />
         Golden Land Real Estate
       </Link>
 
