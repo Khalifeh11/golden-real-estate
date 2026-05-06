@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { getPropertyBySlug, getAgentById, getSimilarProperties } from "@/lib/properties";
 import { formatPrice, formatArea, categoryLabel, featureIcon } from "@/lib/utils";
 import PropertyGallery from "@/components/PropertyGallery";
@@ -20,9 +21,14 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
+async function isStaffSession(): Promise<boolean> {
+  const session = await auth();
+  return !!session?.user?.role && ["ADMIN", "AGENT"].includes(session.user.role);
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const property = await getPropertyBySlug(slug);
+  const property = await getPropertyBySlug(slug, await isStaffSession());
 
   if (!property) {
     return { title: "Property Not Found | Golden Land Real Estate" };
@@ -53,7 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PropertyDetailPage({ params }: Props) {
   const { slug } = await params;
-  const property = await getPropertyBySlug(slug);
+  const property = await getPropertyBySlug(slug, await isStaffSession());
   if (!property) notFound();
 
   const [agent, similarProperties] = await Promise.all([

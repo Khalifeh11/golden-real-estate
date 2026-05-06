@@ -4,6 +4,7 @@ import dbConnect from "@/lib/mongodb";
 import Property from "@/models/Property";
 import { propertyCreateSchema } from "@/lib/validators";
 import { slugify } from "@/lib/utils";
+import { OTHER_COUNTRY_VALUE, PRIMARY_COUNTRIES } from "@/lib/constants";
 
 function generateReferenceNumber(): string {
   const num = Math.floor(10000 + Math.random() * 90000);
@@ -34,7 +35,11 @@ export async function GET(request: NextRequest) {
   if (propertyType) filter.propertyType = propertyType;
 
   const country = searchParams.get("country");
-  if (country) filter.country = country;
+  if (country === OTHER_COUNTRY_VALUE) {
+    filter.country = { $exists: true, $nin: [...PRIMARY_COUNTRIES, null, ""] };
+  } else if (country) {
+    filter.country = country;
+  }
 
   const city = searchParams.get("city");
   if (city) filter.city = city;

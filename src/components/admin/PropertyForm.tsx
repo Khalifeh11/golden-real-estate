@@ -11,7 +11,8 @@ import {
   STATUSES,
   PROPERTY_GROUPS,
   PROPERTY_TYPES,
-  COUNTRIES,
+  PRIMARY_COUNTRIES,
+  OTHER_COUNTRIES,
   CURRENCIES,
   PREDEFINED_FEATURES,
 } from "@/lib/constants";
@@ -233,9 +234,16 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
               className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
             >
               <option value="">Select...</option>
-              {COUNTRIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
+              <optgroup label="Primary">
+                {PRIMARY_COUNTRIES.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Other countries">
+                {OTHER_COUNTRIES.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </optgroup>
             </select>
             {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country.message}</p>}
           </div>

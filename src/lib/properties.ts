@@ -4,6 +4,7 @@ import PropertyModel from "@/models/Property";
 import AgentModel from "@/models/Agent";
 import { propertySearchSchema } from "./validators";
 import { toPropertyCardData, toPropertyListingCardData } from "./utils";
+import { OTHER_COUNTRY_VALUE, PRIMARY_COUNTRIES } from "./constants";
 import type {
   Property,
   Agent,
@@ -29,7 +30,11 @@ export async function searchProperties(
   if (params.category) filter.category = params.category;
   if (params.propertyGroup) filter.propertyGroup = params.propertyGroup;
   if (params.propertyType) filter.propertyType = params.propertyType;
-  if (params.country) filter.country = params.country;
+  if (params.country === OTHER_COUNTRY_VALUE) {
+    filter.country = { $exists: true, $nin: [...PRIMARY_COUNTRIES, null, ""] };
+  } else if (params.country) {
+    filter.country = params.country;
+  }
   if (params.city) filter.city = params.city;
   if (params.district) filter.district = params.district;
   if (params.ref) filter.referenceNumber = params.ref;
@@ -98,7 +103,11 @@ export async function getFilterOptions(context?: {
   const cityFilter = { ...activeFilter };
   const districtFilter = { ...activeFilter };
 
-  if (context?.country) {
+  if (context?.country === OTHER_COUNTRY_VALUE) {
+    const otherFilter = { $exists: true, $nin: [...PRIMARY_COUNTRIES, null, ""] };
+    cityFilter.country = otherFilter;
+    districtFilter.country = otherFilter;
+  } else if (context?.country) {
     cityFilter.country = context.country;
     districtFilter.country = context.country;
   }
@@ -129,9 +138,11 @@ export async function getFeaturedProperties(limit = 6): Promise<PropertyCardData
 // Property detail helpers
 // ---------------------------------------------------------------------------
 
-async function _getPropertyBySlug(slug: string): Promise<Property | null> {
+async function _getPropertyBySlug(slug: string, includeNonActive = false): Promise<Property | null> {
   await dbConnect();
-  const doc = await PropertyModel.findOne({ slug, status: "ACTIVE", trash: { $ne: true } }).lean();
+  const filter: Record<string, unknown> = { slug, trash: { $ne: true } };
+  if (!includeNonActive) filter.status = "ACTIVE";
+  const doc = await PropertyModel.findOne(filter).lean();
   return (doc as unknown as Property) ?? null;
 }
 

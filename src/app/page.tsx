@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CATEGORIES, COUNTRIES } from "@/lib/constants";
+import { CATEGORIES, PRIMARY_COUNTRIES, OTHER_COUNTRY_VALUE } from "@/lib/constants";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -70,11 +70,12 @@ export default async function Home() {
                   className="w-full bg-transparent border-none focus:ring-0 py-4 px-4 text-on-surface font-medium"
                 >
                   <option value="">Country</option>
-                  {COUNTRIES.map((c) => (
+                  {PRIMARY_COUNTRIES.map((c) => (
                     <option key={c} value={c}>
                       {c}
                     </option>
                   ))}
+                  <option value={OTHER_COUNTRY_VALUE}>Other</option>
                 </select>
               </div>
               <button
@@ -138,8 +139,8 @@ export default async function Home() {
           <div className="relative">
             <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-2xl z-10 relative">
               <Image
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdz5nKiDqWB6Pf1vEe_FQj_xrZZtViePhEHIKQaIf5ZSIBmSVjpWWD533kfHM4c5WC9t8DXXBEPAgSdGmQev-zrqDD_fBYjf3rV6MJfaaDcSWOHaCo_vvty_3VukRRNwKWuBBQbNUhdO9L565r_SdgCQF9l3Osv17XsCAweQvRoS24y8jqaabvsQDlo6tZsdNpq69BBMuBhpYgDiNsCjdaIm5R3wn2-KRm1jMqaDFgXoljkSDztaxp0nxjwXXdYiOXSTh1-loeS3vF"
-                alt="High-end interior design with marble and gold accents"
+                src="/trusted-partner.png"
+                alt="Golden Land Real Estate — your trusted real estate partner"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"

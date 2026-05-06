@@ -4,7 +4,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useState, useEffect, useTransition } from "react";
 import * as Slider from "@radix-ui/react-slider";
 import { MdFilterList } from "react-icons/md";
-import { CATEGORIES, PROPERTY_GROUPS, PROPERTY_TYPES, ALL_PROPERTY_TYPES, getSliderConfig } from "@/lib/constants";
+import { CATEGORIES, PROPERTY_GROUPS, PROPERTY_TYPES, ALL_PROPERTY_TYPES, PRIMARY_COUNTRIES, OTHER_COUNTRY_VALUE, getSliderConfig } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { FilterOptions, PropertyGroup } from "@/types";
 
@@ -239,9 +239,10 @@ export default function PropertyFilters({ filterOptions }: PropertyFiltersProps)
             onChange={(e) => updateParams({ country: e.target.value || null, city: null, district: null })}
           >
             <option value="">All Countries</option>
-            {filterOptions.countries.map((c) => (
+            {PRIMARY_COUNTRIES.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
+            <option value={OTHER_COUNTRY_VALUE}>Other</option>
           </select>
         </div>
         <div>
