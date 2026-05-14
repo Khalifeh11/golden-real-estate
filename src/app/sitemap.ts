@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import dbConnect from "@/lib/mongodb";
 import PropertyModel from "@/models/Property";
 import AgentModel from "@/models/Agent";
+import { MIN_LISTING_DATE } from "@/lib/constants";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://goldenlandrealestate.net";
@@ -10,7 +11,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   await dbConnect();
 
   const [properties, agents] = await Promise.all([
-    PropertyModel.find({ status: "ACTIVE", trash: false })
+    PropertyModel.find({
+      status: "ACTIVE",
+      trash: false,
+      createdAt: { $gte: MIN_LISTING_DATE },
+    })
       .select("slug updatedAt")
       .lean(),
     AgentModel.find({ trash: false }).select("_id updatedAt").lean(),

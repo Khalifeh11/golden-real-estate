@@ -4,7 +4,7 @@ import dbConnect from "@/lib/mongodb";
 import Property from "@/models/Property";
 import { propertyCreateSchema } from "@/lib/validators";
 import { slugify } from "@/lib/utils";
-import { OTHER_COUNTRY_VALUE, PRIMARY_COUNTRIES } from "@/lib/constants";
+import { MIN_LISTING_DATE, OTHER_COUNTRY_VALUE, PRIMARY_COUNTRIES } from "@/lib/constants";
 
 function generateReferenceNumber(): string {
   const num = Math.floor(10000 + Math.random() * 90000);
@@ -54,6 +54,11 @@ export async function GET(request: NextRequest) {
     filter.status = status;
   } else {
     filter.status = "ACTIVE";
+  }
+
+  const includeArchived = isAdmin && searchParams.get("includeArchived") === "true";
+  if (!includeArchived) {
+    filter.createdAt = { $gte: MIN_LISTING_DATE };
   }
 
   const ref = searchParams.get("ref");

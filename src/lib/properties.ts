@@ -4,7 +4,7 @@ import PropertyModel from "@/models/Property";
 import AgentModel from "@/models/Agent";
 import { propertySearchSchema } from "./validators";
 import { toPropertyCardData, toPropertyListingCardData } from "./utils";
-import { OTHER_COUNTRY_VALUE, PRIMARY_COUNTRIES } from "./constants";
+import { MIN_LISTING_DATE, OTHER_COUNTRY_VALUE, PRIMARY_COUNTRIES } from "./constants";
 import type {
   Property,
   Agent,
@@ -25,7 +25,11 @@ export async function searchProperties(
 
   await dbConnect();
 
-  const filter: Record<string, unknown> = { status: "ACTIVE", trash: { $ne: true } };
+  const filter: Record<string, unknown> = {
+    status: "ACTIVE",
+    trash: { $ne: true },
+    createdAt: { $gte: MIN_LISTING_DATE },
+  };
 
   if (params.category) filter.category = params.category;
   if (params.propertyGroup) filter.propertyGroup = params.propertyGroup;
@@ -99,7 +103,11 @@ export async function getFilterOptions(context?: {
 }): Promise<FilterOptions> {
   await dbConnect();
 
-  const activeFilter: Record<string, unknown> = { status: "ACTIVE", trash: { $ne: true } };
+  const activeFilter: Record<string, unknown> = {
+    status: "ACTIVE",
+    trash: { $ne: true },
+    createdAt: { $gte: MIN_LISTING_DATE },
+  };
   const cityFilter = { ...activeFilter };
   const districtFilter = { ...activeFilter };
 
@@ -127,7 +135,12 @@ export async function getFilterOptions(context?: {
 
 export async function getFeaturedProperties(limit = 6): Promise<PropertyCardData[]> {
   await dbConnect();
-  const docs = await PropertyModel.find({ status: "ACTIVE", trash: { $ne: true }, isFeatured: true })
+  const docs = await PropertyModel.find({
+    status: "ACTIVE",
+    trash: { $ne: true },
+    createdAt: { $gte: MIN_LISTING_DATE },
+    isFeatured: true,
+  })
     .sort({ createdAt: -1 })
     .limit(limit)
     .lean();
@@ -141,7 +154,10 @@ export async function getFeaturedProperties(limit = 6): Promise<PropertyCardData
 async function _getPropertyBySlug(slug: string, includeNonActive = false): Promise<Property | null> {
   await dbConnect();
   const filter: Record<string, unknown> = { slug, trash: { $ne: true } };
-  if (!includeNonActive) filter.status = "ACTIVE";
+  if (!includeNonActive) {
+    filter.status = "ACTIVE";
+    filter.createdAt = { $gte: MIN_LISTING_DATE };
+  }
   const doc = await PropertyModel.findOne(filter).lean();
   return (doc as unknown as Property) ?? null;
 }
@@ -166,7 +182,12 @@ export const getAgentById = cache(_getAgentById);
 
 export async function getPropertiesByAgentId(agentId: string): Promise<PropertyCardData[]> {
   await dbConnect();
-  const docs = await PropertyModel.find({ agentId, status: "ACTIVE", trash: { $ne: true } })
+  const docs = await PropertyModel.find({
+    agentId,
+    status: "ACTIVE",
+    trash: { $ne: true },
+    createdAt: { $gte: MIN_LISTING_DATE },
+  })
     .sort({ createdAt: -1 })
     .lean();
   return (docs as unknown as Property[]).map(toPropertyCardData);
@@ -178,7 +199,12 @@ export async function getSimilarProperties(
 ): Promise<PropertyCardData[]> {
   await dbConnect();
 
-  const baseFilter = { status: "ACTIVE", trash: { $ne: true }, _id: { $ne: property._id } };
+  const baseFilter = {
+    status: "ACTIVE",
+    trash: { $ne: true },
+    createdAt: { $gte: MIN_LISTING_DATE },
+    _id: { $ne: property._id },
+  };
   const results: Property[] = [];
 
   // Step 1: same district + category

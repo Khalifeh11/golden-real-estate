@@ -18,6 +18,7 @@ export default function AdminPropertiesPage() {
   const [category, setCategory] = useState("");
   const [propertyGroup, setPropertyGroup] = useState("");
   const [country, setCountry] = useState("");
+  const [includeArchived, setIncludeArchived] = useState(false);
   const [countries, setCountries] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,6 +43,7 @@ export default function AdminPropertiesPage() {
     if (category) params.set("category", category);
     if (propertyGroup) params.set("propertyGroup", propertyGroup);
     if (country) params.set("country", country);
+    if (includeArchived) params.set("includeArchived", "true");
 
     fetch(`/api/properties?${params}`)
       .then((res) => res.json())
@@ -54,7 +56,7 @@ export default function AdminPropertiesPage() {
       });
 
     return () => { cancelled = true; };
-  }, [page, search, status, category, propertyGroup, country]);
+  }, [page, search, status, category, propertyGroup, country, includeArchived]);
 
   async function handleStatusChange(id: string, newStatus: string) {
     const res = await fetch(`/api/properties/${id}/status`, {
@@ -165,6 +167,15 @@ export default function AdminPropertiesPage() {
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
+        <label className="flex items-center gap-2 text-sm text-gray-600 px-2">
+          <input
+            type="checkbox"
+            checked={includeArchived}
+            onChange={(e) => { setIncludeArchived(e.target.checked); setPage(1); }}
+            className="rounded border-gray-300 focus:ring-gray-300"
+          />
+          Show pre-2022
+        </label>
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200">

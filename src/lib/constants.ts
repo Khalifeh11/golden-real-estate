@@ -58,6 +58,10 @@ export const PRIMARY_COUNTRIES = ["Lebanon", "Cyprus", "Greece", "Georgia"] as c
 // PRIMARY_COUNTRIES" (matched server-side via $nin).
 export const OTHER_COUNTRY_VALUE = "__OTHER__";
 
+// Listings created before this date are treated as archive and hidden from the
+// public site. Admin can opt back in via the "Show pre-2022" toggle.
+export const MIN_LISTING_DATE = new Date("2022-01-01T00:00:00.000Z");
+
 // Comprehensive country list (UN members + commonly-listed territories),
 // minus the four PRIMARY_COUNTRIES which are listed separately.
 export const OTHER_COUNTRIES = [
