@@ -56,9 +56,14 @@ export async function GET(request: NextRequest) {
     filter.status = "ACTIVE";
   }
 
-  const includeArchived = isAdmin && searchParams.get("includeArchived") === "true";
-  if (!includeArchived) {
+  const scopeParam = searchParams.get("scope");
+  const scope = isAdmin && scopeParam && ["recent", "archived", "all"].includes(scopeParam)
+    ? scopeParam
+    : "recent";
+  if (scope === "recent") {
     filter.createdAt = { $gte: MIN_LISTING_DATE };
+  } else if (scope === "archived") {
+    filter.createdAt = { $lt: MIN_LISTING_DATE };
   }
 
   const ref = searchParams.get("ref");

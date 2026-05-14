@@ -18,7 +18,7 @@ export default function AdminPropertiesPage() {
   const [category, setCategory] = useState("");
   const [propertyGroup, setPropertyGroup] = useState("");
   const [country, setCountry] = useState("");
-  const [includeArchived, setIncludeArchived] = useState(false);
+  const [scope, setScope] = useState<"recent" | "archived" | "all">("recent");
   const [countries, setCountries] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -43,7 +43,7 @@ export default function AdminPropertiesPage() {
     if (category) params.set("category", category);
     if (propertyGroup) params.set("propertyGroup", propertyGroup);
     if (country) params.set("country", country);
-    if (includeArchived) params.set("includeArchived", "true");
+    if (scope !== "recent") params.set("scope", scope);
 
     fetch(`/api/properties?${params}`)
       .then((res) => res.json())
@@ -56,7 +56,7 @@ export default function AdminPropertiesPage() {
       });
 
     return () => { cancelled = true; };
-  }, [page, search, status, category, propertyGroup, country, includeArchived]);
+  }, [page, search, status, category, propertyGroup, country, scope]);
 
   async function handleStatusChange(id: string, newStatus: string) {
     const res = await fetch(`/api/properties/${id}/status`, {
@@ -118,6 +118,28 @@ export default function AdminPropertiesPage() {
         </Link>
       </div>
 
+      {/* Scope tabs */}
+      <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 mb-4">
+        {([
+          { value: "recent", label: "Recent" },
+          { value: "archived", label: "Archived" },
+          { value: "all", label: "All" },
+        ] as const).map((opt) => (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => { setScope(opt.value); setPage(1); }}
+            className={`px-4 py-1.5 text-sm rounded-md transition-colors ${
+              scope === opt.value
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-4">
         <input
@@ -167,15 +189,6 @@ export default function AdminPropertiesPage() {
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
-        <label className="flex items-center gap-2 text-sm text-gray-600 px-2">
-          <input
-            type="checkbox"
-            checked={includeArchived}
-            onChange={(e) => { setIncludeArchived(e.target.checked); setPage(1); }}
-            className="rounded border-gray-300 focus:ring-gray-300"
-          />
-          Show pre-2022
-        </label>
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200">
