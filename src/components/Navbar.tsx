@@ -25,10 +25,10 @@ export default function Navbar() {
         <Image
           src="/logo.png"
           alt="Golden Land Real Estate logo"
-          width={48}
-          height={32}
+          width={72}
+          height={48}
           priority
-          className="h-8 w-auto"
+          className="h-12 w-auto"
         />
         Golden Land Real Estate
       </Link>
