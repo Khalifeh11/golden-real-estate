@@ -61,12 +61,6 @@ export default function PropertyListingCard({ property }: PropertyListingCardPro
           {property.title}
         </h3>
 
-        {location && (
-          <p className="text-sm text-outline flex items-center gap-1 mb-4">
-            <span className="material-symbols-outlined text-sm">location_on</span>
-            {location}
-          </p>
-        )}
 
         <div className="mb-6">
           {formattedPrice ? (
