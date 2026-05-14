@@ -93,7 +93,7 @@ export default async function PropertyDetailPage({ params }: Props) {
         ]}
       />
       <Navbar />
-      <main className="pt-24 pb-16 max-w-7xl mx-auto px-4 md:px-8">
+      <main className="pt-24 pb-16 w-full max-w-7xl mx-auto px-4 md:px-8">
       {/* Photo Gallery */}
       <PropertyGallery images={sortedImages} title={property.title} />
 

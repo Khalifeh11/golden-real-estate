@@ -5,7 +5,7 @@ export default function PropertyDetailLoading() {
   return (
     <>
       <Navbar />
-      <main className="pt-24 pb-16 max-w-7xl mx-auto px-4 md:px-8">
+      <main className="pt-24 pb-16 w-full max-w-7xl mx-auto px-4 md:px-8">
         {/* Gallery placeholder */}
         <SkeletonImage className="aspect-[16/9] w-full mb-12 rounded-xl" />
 
