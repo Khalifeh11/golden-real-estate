@@ -9,6 +9,28 @@ interface PropertyImageUploadProps {
   onChange: (images: PropertyImage[]) => void;
 }
 
+async function friendlyUploadError(res: Response): Promise<string> {
+  // Try to read a JSON error message from our API first.
+  try {
+    const json = await res.clone().json();
+    if (json?.error) return json.error as string;
+  } catch {
+    // Fall through to status-based message.
+  }
+
+  if (res.status === 401 || res.status === 403) {
+    return "Your session expired. Please sign in and try again.";
+  }
+  if (res.status === 413) {
+    return "Image is too large to upload. Please use a smaller file.";
+  }
+  if (res.status >= 500) {
+    // Vercel/edge errors return a plain-text page (with an error ID) rather than JSON.
+    return "Upload failed. The image may be too large, or the server is temporarily unavailable. Please try a smaller image or try again in a moment.";
+  }
+  return "Upload failed. Please try again.";
+}
+
 export default function PropertyImageUpload({ images, onChange }: PropertyImageUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -21,39 +43,60 @@ export default function PropertyImageUpload({ images, onChange }: PropertyImageU
       setError("");
       setUploading(true);
 
-      const formData = new FormData();
-      for (const file of Array.from(files)) {
-        formData.append("files", file);
-      }
+      const fileArray = Array.from(files);
 
       try {
-        const res = await fetch("/api/upload", { method: "POST", body: formData });
-        if (!res.ok) {
-          const text = await res.text();
-          try {
-            const json = JSON.parse(text);
-            setError(json.error ?? "Upload failed");
-          } catch {
-            setError(`Upload failed (${res.status}): ${text.slice(0, 200)}`);
-          }
-          setUploading(false);
+        const urlRes = await fetch("/api/upload-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            files: fileArray.map((f) => ({ name: f.name, type: f.type, size: f.size })),
+          }),
+        });
+        if (!urlRes.ok) {
+          setError(await friendlyUploadError(urlRes));
           return;
         }
+        const { uploads } = (await urlRes.json()) as {
+          uploads: { key: string; uploadUrl: string; publicUrl: string }[];
+        };
 
-        const { uploaded } = await res.json();
-        const nextOrder = images.length;
-        const newImages: PropertyImage[] = uploaded.map(
-          (u: { url: string; thumbnailUrl?: string }, i: number) => ({
-            url: u.url,
-            thumbnailUrl: u.thumbnailUrl ?? u.url,
-            altText: "",
-            order: nextOrder + i,
+        const results = await Promise.all(
+          uploads.map(async (u, i) => {
+            const file = fileArray[i];
+            const putRes = await fetch(u.uploadUrl, {
+              method: "PUT",
+              headers: { "Content-Type": file.type },
+              body: file,
+            });
+            if (!putRes.ok) {
+              throw new Error(`Upload to storage failed for "${file.name}".`);
+            }
+
+            const thumbRes = await fetch("/api/thumbnail", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ key: u.key }),
+            });
+            const thumbnailUrl = thumbRes.ok
+              ? ((await thumbRes.json()) as { thumbnailUrl: string }).thumbnailUrl
+              : u.publicUrl;
+
+            return { url: u.publicUrl, thumbnailUrl };
           })
         );
 
+        const nextOrder = images.length;
+        const newImages: PropertyImage[] = results.map((r, i) => ({
+          url: r.url,
+          thumbnailUrl: r.thumbnailUrl,
+          altText: "",
+          order: nextOrder + i,
+        }));
+
         onChange([...images, ...newImages]);
-      } catch {
-        setError("Upload failed. Please try again.");
+      } catch (err) {
+        setError(err instanceof Error && err.message ? err.message : "Couldn't reach the server. Check your connection and try again.");
       } finally {
         setUploading(false);
       }
@@ -148,7 +191,7 @@ export default function PropertyImageUpload({ images, onChange }: PropertyImageU
               }`}
             >
               <Image
-                src={img.url}
+                src={img.thumbnailUrl || img.url}
                 alt={img.altText || `Image ${index + 1}`}
                 fill
                 className="object-cover"

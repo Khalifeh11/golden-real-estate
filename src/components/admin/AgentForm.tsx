@@ -33,17 +33,36 @@ export default function AgentForm({ agent, onSave, onCancel }: AgentFormProps) {
 
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("files", file);
+      const urlRes = await fetch("/api/upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          files: [{ name: file.name, type: file.type, size: file.size }],
+        }),
+      });
+      if (!urlRes.ok) {
+        const body = await urlRes.json().catch(() => null);
+        if (body?.error) throw new Error(body.error);
+        if (urlRes.status === 401 || urlRes.status === 403) {
+          throw new Error("Your session expired. Please sign in and try again.");
+        }
+        throw new Error("Upload failed. Please try again.");
+      }
+      const { uploads } = (await urlRes.json()) as {
+        uploads: { key: string; uploadUrl: string; publicUrl: string }[];
+      };
+      const upload = uploads[0];
 
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        throw new Error(body?.error ?? "Upload failed");
+      const putRes = await fetch(upload.uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      if (!putRes.ok) {
+        throw new Error("Upload to storage failed. Please try again.");
       }
 
-      const { uploaded } = await res.json();
-      set("photoUrl", uploaded[0].url);
+      set("photoUrl", upload.publicUrl);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Upload failed");
     } finally {
