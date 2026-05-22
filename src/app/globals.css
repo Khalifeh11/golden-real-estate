@@ -107,3 +107,9 @@ body {
   background: var(--surface);
   color: var(--on-surface);
 }
+
+@layer base {
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+}
