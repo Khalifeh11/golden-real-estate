@@ -11,6 +11,7 @@ export interface IContactRequest extends Document<string> {
   isRead: boolean;
   isResponded: boolean;
   trash: boolean;
+  ipAddress?: string;
   createdAt: Date;
 }
 
@@ -25,6 +26,7 @@ const ContactRequestSchema = new Schema<IContactRequest>({
   isRead: { type: Boolean, default: false },
   isResponded: { type: Boolean, default: false },
   trash: { type: Boolean, default: false },
+  ipAddress: String,
   createdAt: { type: Date, default: Date.now },
 });
 

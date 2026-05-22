@@ -69,6 +69,15 @@ export default function InquiryForm({
         )}
         <input type="hidden" name="subject" value={resolvedSubject} />
 
+        <input
+          type="text"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px" }}
+        />
+
         <div>
           <label className="block text-xs uppercase tracking-widest text-outline mb-1">
             Full Name

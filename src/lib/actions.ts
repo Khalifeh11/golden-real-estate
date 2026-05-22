@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import dbConnect from "./mongodb";
 import ContactRequestModel from "@/models/ContactRequest";
 import { contactFormSchema } from "./validators";
@@ -11,10 +12,19 @@ export type InquiryFormState = {
   errors?: Record<string, string[]>;
 };
 
+const SUCCESS_MESSAGE =
+  "Your inquiry has been submitted successfully. We will get back to you shortly.";
+
 export async function submitInquiry(
   _prevState: InquiryFormState,
   formData: FormData,
 ): Promise<InquiryFormState> {
+  // Honeypot: real users never fill this hidden field.
+  // Fake success so bots don't learn they were rejected.
+  if (formData.get("website")) {
+    return { success: true, message: SUCCESS_MESSAGE };
+  }
+
   const raw = {
     name: formData.get("name"),
     email: formData.get("email"),
@@ -34,7 +44,26 @@ export async function submitInquiry(
     };
   }
 
+  const h = await headers();
+  const ip =
+    h.get("x-forwarded-for")?.split(",")[0].trim() ||
+    h.get("x-real-ip") ||
+    null;
+
   await dbConnect();
+
+  if (ip) {
+    const recent = await ContactRequestModel.countDocuments({
+      ipAddress: ip,
+      createdAt: { $gte: new Date(Date.now() - 60 * 60 * 1000) },
+    });
+    if (recent >= 5) {
+      return {
+        success: false,
+        message: "Too many submissions. Please try again later.",
+      };
+    }
+  }
 
   await ContactRequestModel.create({
     _id: crypto.randomUUID(),
@@ -44,6 +73,7 @@ export async function submitInquiry(
     message: result.data.message,
     propertySlug: result.data.propertySlug,
     subject: result.data.subject,
+    ipAddress: ip ?? undefined,
   });
 
   // Fire-and-forget — don't block the user response on email delivery
@@ -56,5 +86,5 @@ export async function submitInquiry(
     propertySlug: result.data.propertySlug,
   }).catch(() => {});
 
-  return { success: true, message: "Your inquiry has been submitted successfully. We will get back to you shortly." };
+  return { success: true, message: SUCCESS_MESSAGE };
 }
