@@ -46,3 +46,4 @@ goldenland-db/
 goldenland-db-data/
 images-backup/
 migration.log
+.playwright-cli/
