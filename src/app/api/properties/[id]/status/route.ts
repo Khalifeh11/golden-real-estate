@@ -5,7 +5,7 @@ import Property from "@/models/Property";
 import { z } from "zod";
 
 const statusSchema = z.object({
-  status: z.enum(["ACTIVE", "PENDING", "SOLD", "UNDER_OFFER", "INACTIVE"]),
+  status: z.enum(["ACTIVE", "PENDING", "SOLD", "UNDER_OFFER", "INACTIVE"]).optional(),
   isFeatured: z.boolean().optional(),
 });
 
