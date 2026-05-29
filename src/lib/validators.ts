@@ -53,6 +53,7 @@ export type PropertySearchData = z.infer<typeof propertySearchSchema>;
 
 export const propertyCreateSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
+  referenceNumber: z.string().trim().min(1, "Reference number is required"),
   description: z.string().optional(),
   price: z.number().min(0, "Price must be positive").optional(),
   currency: z.enum(["USD", "EUR"]).default("USD"),

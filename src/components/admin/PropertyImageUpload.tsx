@@ -3,6 +3,46 @@
 import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import type { PropertyImage } from "@/types";
+import { generateThumbnailBlob } from "@/lib/clientImage";
+
+const UPLOAD_CONCURRENCY = 4;
+
+interface UploadSlot {
+  key: string;
+  uploadUrl: string;
+  publicUrl: string;
+}
+
+async function putToR2(uploadUrl: string, body: Blob | File, contentType: string) {
+  const res = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: { "Content-Type": contentType },
+    body,
+  });
+  if (!res.ok) throw new Error("storage rejected the upload");
+}
+
+/** Run `worker` over `items` with at most `limit` tasks in flight; never rejects. */
+async function runPool<T, R>(
+  items: T[],
+  limit: number,
+  worker: (item: T, index: number) => Promise<R>
+): Promise<PromiseSettledResult<R>[]> {
+  const results: PromiseSettledResult<R>[] = new Array(items.length);
+  let cursor = 0;
+  const runners = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (cursor < items.length) {
+      const i = cursor++;
+      try {
+        results[i] = { status: "fulfilled", value: await worker(items[i], i) };
+      } catch (reason) {
+        results[i] = { status: "rejected", reason };
+      }
+    }
+  });
+  await Promise.all(runners);
+  return results;
+}
 
 interface PropertyImageUploadProps {
   images: PropertyImage[];
@@ -33,6 +73,7 @@ async function friendlyUploadError(res: Response): Promise<string> {
 
 export default function PropertyImageUpload({ images, onChange }: PropertyImageUploadProps) {
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -40,61 +81,77 @@ export default function PropertyImageUpload({ images, onChange }: PropertyImageU
 
   const uploadFiles = useCallback(
     async (files: FileList | File[]) => {
+      const fileArray = Array.from(files);
+      if (fileArray.length === 0) return;
+
       setError("");
       setUploading(true);
-
-      const fileArray = Array.from(files);
+      setProgress({ done: 0, total: fileArray.length });
 
       try {
+        // Mint two presigned URLs per file (original + thumbnail), interleaved
+        // so file i maps to uploads[2i] (original) and uploads[2i+1] (thumb).
         const urlRes = await fetch("/api/upload-url", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            files: fileArray.map((f) => ({ name: f.name, type: f.type, size: f.size })),
+            files: fileArray.flatMap((f) => [
+              { name: f.name, type: f.type, size: f.size },
+              { name: `${f.name}.webp`, type: "image/webp", size: f.size, kind: "thumbnail" },
+            ]),
           }),
         });
         if (!urlRes.ok) {
           setError(await friendlyUploadError(urlRes));
           return;
         }
-        const { uploads } = (await urlRes.json()) as {
-          uploads: { key: string; uploadUrl: string; publicUrl: string }[];
-        };
+        const { uploads } = (await urlRes.json()) as { uploads: UploadSlot[] };
 
-        const results = await Promise.all(
-          uploads.map(async (u, i) => {
-            const file = fileArray[i];
-            const putRes = await fetch(u.uploadUrl, {
-              method: "PUT",
-              headers: { "Content-Type": file.type },
-              body: file,
-            });
-            if (!putRes.ok) {
-              throw new Error(`Upload to storage failed for "${file.name}".`);
-            }
+        const settled = await runPool(fileArray, UPLOAD_CONCURRENCY, async (file, i) => {
+          const original = uploads[2 * i];
+          const thumb = uploads[2 * i + 1];
 
-            const thumbRes = await fetch("/api/thumbnail", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ key: u.key }),
-            });
-            const thumbnailUrl = thumbRes.ok
-              ? ((await thumbRes.json()) as { thumbnailUrl: string }).thumbnailUrl
-              : u.publicUrl;
+          // Thumbnail is best-effort: if browser encoding fails, fall back to
+          // pointing thumbnailUrl at the full-size original.
+          let thumbnailUrl = original.publicUrl;
+          let thumbBlob: Blob | null = null;
+          try {
+            thumbBlob = await generateThumbnailBlob(file);
+          } catch {
+            thumbBlob = null;
+          }
 
-            return { url: u.publicUrl, thumbnailUrl };
-          })
-        );
+          await Promise.all([
+            putToR2(original.uploadUrl, file, file.type),
+            thumbBlob ? putToR2(thumb.uploadUrl, thumbBlob, "image/webp") : Promise.resolve(),
+          ]);
+          if (thumbBlob) thumbnailUrl = thumb.publicUrl;
 
-        const nextOrder = images.length;
-        const newImages: PropertyImage[] = results.map((r, i) => ({
-          url: r.url,
-          thumbnailUrl: r.thumbnailUrl,
-          altText: "",
-          order: nextOrder + i,
-        }));
+          setProgress((p) => ({ ...p, done: p.done + 1 }));
+          return { url: original.publicUrl, thumbnailUrl, name: file.name };
+        });
 
-        onChange([...images, ...newImages]);
+        const succeeded = settled
+          .filter((r): r is PromiseFulfilledResult<{ url: string; thumbnailUrl: string; name: string }> => r.status === "fulfilled")
+          .map((r) => r.value);
+        const failedNames = fileArray
+          .filter((_, i) => settled[i].status === "rejected")
+          .map((f) => f.name);
+
+        if (succeeded.length > 0) {
+          const nextOrder = images.length;
+          const newImages: PropertyImage[] = succeeded.map((r, i) => ({
+            url: r.url,
+            thumbnailUrl: r.thumbnailUrl,
+            altText: "",
+            order: nextOrder + i,
+          }));
+          onChange([...images, ...newImages]);
+        }
+
+        if (failedNames.length > 0) {
+          setError(`${failedNames.length} of ${fileArray.length} failed to upload: ${failedNames.join(", ")}`);
+        }
       } catch (err) {
         setError(err instanceof Error && err.message ? err.message : "Couldn't reach the server. Check your connection and try again.");
       } finally {
@@ -147,7 +204,9 @@ export default function PropertyImageUpload({ images, onChange }: PropertyImageU
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-8m0 0l-3 3m3-3l3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.338-2.32 3.75 3.75 0 013.57 5.305A3 3 0 0118 19.5H6.75z" />
         </svg>
         <p className="text-sm text-gray-600">
-          {uploading ? "Uploading..." : "Drag & drop images here, or click to browse"}
+          {uploading
+            ? `Uploading ${progress.done} of ${progress.total}…`
+            : "Drag & drop images here, or click to browse"}
         </p>
         <p className="text-xs text-gray-400 mt-1">JPG, PNG, WebP — max 10MB each</p>
         <input

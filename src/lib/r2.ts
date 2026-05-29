@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const R2 = new S3Client({
@@ -14,7 +14,7 @@ export function getPublicUrl(key: string): string {
   return `${process.env.R2_PUBLIC_URL}/${key}`;
 }
 
-export async function presignPut(key: string, contentType: string, expiresIn = 300): Promise<string> {
+export async function presignPut(key: string, contentType: string, expiresIn = 3600): Promise<string> {
   return getSignedUrl(
     R2,
     new PutObjectCommand({
@@ -24,18 +24,6 @@ export async function presignPut(key: string, contentType: string, expiresIn = 3
     }),
     { expiresIn }
   );
-}
-
-export async function fetchFromR2(key: string): Promise<Buffer> {
-  const res = await R2.send(
-    new GetObjectCommand({
-      Bucket: process.env.R2_BUCKET!,
-      Key: key,
-    })
-  );
-  if (!res.Body) throw new Error(`R2 object ${key} has no body`);
-  const bytes = await res.Body.transformToByteArray();
-  return Buffer.from(bytes);
 }
 
 export async function uploadToR2(

@@ -57,7 +57,7 @@ const PropertySchema = new Schema<IProperty>(
     _id: { type: String, required: true },
     title: { type: String, required: true },
     slug: { type: String, required: true },
-    referenceNumber: { type: String, sparse: true },
+    referenceNumber: { type: String, unique: true, sparse: true },
     description: String,
     price: Number,
     currency: { type: String, default: "USD" },

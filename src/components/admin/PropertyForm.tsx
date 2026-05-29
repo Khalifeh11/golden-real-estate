@@ -89,7 +89,12 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
 
     if (!res.ok) {
       const json = await res.json();
-      toast.error(json.error?.formErrors?.[0] ?? "Failed to save property.");
+      const msg =
+        json.error?.formErrors?.[0] ??
+        json.error?.fieldErrors?.referenceNumber?.[0] ??
+        (typeof json.error === "string" ? json.error : null) ??
+        "Failed to save property.";
+      toast.error(msg);
       setSaving(false);
       return;
     }
@@ -112,6 +117,16 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
             className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
           />
           {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Reference Number *</label>
+          <input
+            {...register("referenceNumber", { required: "Reference number is required" })}
+            placeholder="e.g. 226090"
+            className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+          />
+          {errors.referenceNumber && <p className="text-red-500 text-xs mt-1">{errors.referenceNumber.message}</p>}
         </div>
 
         <div>

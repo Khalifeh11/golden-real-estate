@@ -6,11 +6,6 @@ import { propertyCreateSchema } from "@/lib/validators";
 import { slugify } from "@/lib/utils";
 import { MIN_LISTING_DATE, OTHER_COUNTRY_VALUE, PRIMARY_COUNTRIES } from "@/lib/constants";
 
-function generateReferenceNumber(): string {
-  const num = Math.floor(10000 + Math.random() * 90000);
-  return `GL-${num}`;
-}
-
 export async function GET(request: NextRequest) {
   await dbConnect();
 
@@ -133,7 +128,18 @@ export async function POST(request: NextRequest) {
 
   const data = parsed.data;
   const slug = slugify(data.title);
-  const referenceNumber = generateReferenceNumber();
+
+  // Reference numbers are entered manually and must be unique across listings
+  const dup = await Property.findOne({
+    referenceNumber: data.referenceNumber,
+    trash: { $ne: true },
+  }).lean();
+  if (dup) {
+    return NextResponse.json(
+      { error: `Reference number "${data.referenceNumber}" is already in use.` },
+      { status: 409 }
+    );
+  }
 
   // Ensure slug is unique
   const existing = await Property.findOne({ slug });
@@ -143,7 +149,6 @@ export async function POST(request: NextRequest) {
     _id: crypto.randomUUID(),
     ...data,
     slug: finalSlug,
-    referenceNumber,
   });
 
   return NextResponse.json(property, { status: 201 });
