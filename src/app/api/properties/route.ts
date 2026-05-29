@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import dbConnect from "@/lib/mongodb";
+import dbConnect, { isDuplicateKeyError } from "@/lib/mongodb";
 import Property from "@/models/Property";
 import { propertyCreateSchema } from "@/lib/validators";
 import { slugify } from "@/lib/utils";
@@ -145,11 +145,22 @@ export async function POST(request: NextRequest) {
   const existing = await Property.findOne({ slug });
   const finalSlug = existing ? `${slug}-${Date.now()}` : slug;
 
-  const property = await Property.create({
-    _id: crypto.randomUUID(),
-    ...data,
-    slug: finalSlug,
-  });
-
-  return NextResponse.json(property, { status: 201 });
+  try {
+    const property = await Property.create({
+      _id: crypto.randomUUID(),
+      ...data,
+      slug: finalSlug,
+    });
+    return NextResponse.json(property, { status: 201 });
+  } catch (err) {
+    // Backstop the findOne check above against the check-then-insert race:
+    // the unique index rejects the second concurrent insert with code 11000.
+    if (isDuplicateKeyError(err)) {
+      return NextResponse.json(
+        { error: `Reference number "${data.referenceNumber}" is already in use.` },
+        { status: 409 }
+      );
+    }
+    throw err;
+  }
 }

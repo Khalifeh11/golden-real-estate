@@ -57,7 +57,7 @@ const PropertySchema = new Schema<IProperty>(
     _id: { type: String, required: true },
     title: { type: String, required: true },
     slug: { type: String, required: true },
-    referenceNumber: { type: String, unique: true, sparse: true },
+    referenceNumber: { type: String },
     description: String,
     price: Number,
     currency: { type: String, default: "USD" },
@@ -106,6 +106,15 @@ const PropertySchema = new Schema<IProperty>(
     views: { type: Number, default: 0 },
   },
   { timestamps: true }
+);
+
+// Reference numbers are entered manually and must be unique — but only among
+// active listings. A partial filter on `trash` mirrors the app-level checks
+// (which all exclude trashed docs) so a soft-deleted listing's number is freed
+// for reuse and the DB never disagrees with the application.
+PropertySchema.index(
+  { referenceNumber: 1 },
+  { unique: true, partialFilterExpression: { trash: { $ne: true } } }
 );
 
 PropertySchema.index(

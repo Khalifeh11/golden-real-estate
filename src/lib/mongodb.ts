@@ -36,3 +36,17 @@ export default async function dbConnect(): Promise<typeof mongoose> {
   }
   return cached.conn;
 }
+
+/**
+ * True when an error is a MongoDB duplicate-key error (code 11000) — i.e. a
+ * unique index rejected a write. Used to convert the race that slips past
+ * app-level uniqueness checks into a friendly 409 instead of a 500.
+ */
+export function isDuplicateKeyError(err: unknown): boolean {
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    "code" in err &&
+    (err as { code?: number }).code === 11000
+  );
+}

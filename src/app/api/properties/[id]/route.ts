@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import dbConnect from "@/lib/mongodb";
+import dbConnect, { isDuplicateKeyError } from "@/lib/mongodb";
 import Property from "@/models/Property";
 import { propertyUpdateSchema } from "@/lib/validators";
 
@@ -54,12 +54,23 @@ export async function PUT(
     }
   }
 
-  const property = await Property.findByIdAndUpdate(id, parsed.data, { new: true }).lean();
-  if (!property) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  try {
+    const property = await Property.findByIdAndUpdate(id, parsed.data, { new: true }).lean();
+    if (!property) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+    return NextResponse.json(property);
+  } catch (err) {
+    // Backstop the dup check above against a concurrent update claiming the
+    // same reference number — the unique index rejects it with code 11000.
+    if (isDuplicateKeyError(err)) {
+      return NextResponse.json(
+        { error: `Reference number "${parsed.data.referenceNumber}" is already in use.` },
+        { status: 409 }
+      );
+    }
+    throw err;
   }
-
-  return NextResponse.json(property);
 }
 
 export async function DELETE(
