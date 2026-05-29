@@ -40,6 +40,20 @@ export async function PUT(
 
   await dbConnect();
 
+  if (parsed.data.referenceNumber) {
+    const dup = await Property.findOne({
+      _id: { $ne: id },
+      referenceNumber: parsed.data.referenceNumber,
+      trash: { $ne: true },
+    }).lean();
+    if (dup) {
+      return NextResponse.json(
+        { error: `Reference number "${parsed.data.referenceNumber}" is already in use.` },
+        { status: 409 }
+      );
+    }
+  }
+
   const property = await Property.findByIdAndUpdate(id, parsed.data, { new: true }).lean();
   if (!property) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });

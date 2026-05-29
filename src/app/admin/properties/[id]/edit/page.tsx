@@ -17,6 +17,7 @@ export default async function EditPropertyPage({
 
   const defaultValues: Partial<PropertyCreateData> = {
     title: property.title,
+    referenceNumber: property.referenceNumber,
     description: property.description,
     price: property.price,
     currency: (property.currency as "USD" | "EUR") ?? "USD",

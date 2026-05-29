@@ -9,6 +9,7 @@ interface FileSpec {
   name: string;
   type: string;
   size: number;
+  kind?: "thumbnail";
 }
 
 export async function POST(request: NextRequest) {
@@ -50,7 +51,8 @@ export async function POST(request: NextRequest) {
   const uploads = await Promise.all(
     files.map(async (f) => {
       const ext = f.name.split(".").pop()?.toLowerCase() ?? "jpg";
-      const key = `properties/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const prefix = f.kind === "thumbnail" ? "properties/thumbs/" : "properties/";
+      const key = `${prefix}${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
       const uploadUrl = await presignPut(key, f.type);
       return { key, uploadUrl, publicUrl: getPublicUrl(key) };
     })
