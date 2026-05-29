@@ -13,6 +13,9 @@ import PropertyJsonLd from "@/components/seo/PropertyJsonLd";
 import BreadcrumbJsonLd from "@/components/seo/BreadcrumbJsonLd";
 import sanitizeHtml from "sanitize-html";
 
+// Render on every request so admin edits/deletes appear immediately.
+export const dynamic = "force-dynamic";
+
 function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, "");
 }

@@ -4,6 +4,7 @@ import dbConnect, { isDuplicateKeyError } from "@/lib/mongodb";
 import Property from "@/models/Property";
 import { propertyCreateSchema } from "@/lib/validators";
 import { slugify } from "@/lib/utils";
+import { buildSearchFilter } from "@/lib/search";
 import { MIN_LISTING_DATE, OTHER_COUNTRY_VALUE, PRIMARY_COUNTRIES } from "@/lib/constants";
 
 export async function GET(request: NextRequest) {
@@ -18,7 +19,10 @@ export async function GET(request: NextRequest) {
   const filter: Record<string, any> = { trash: { $ne: true } };
 
   const q = searchParams.get("q")?.trim();
-  if (q) filter.$text = { $search: q };
+  if (q) {
+    const search = buildSearchFilter(q);
+    if (search) Object.assign(filter, search);
+  }
 
   const category = searchParams.get("category");
   if (category) filter.category = category;

@@ -7,6 +7,9 @@ import { getAgents } from "@/lib/properties";
 import Link from "next/link";
 import type { Metadata } from "next";
 
+// Render on every request so admin changes (add/edit/delete agents) appear immediately.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Meet Our Advisors | Golden Land Real Estate",
   description:

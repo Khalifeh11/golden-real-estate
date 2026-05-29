@@ -10,6 +10,9 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import AgentJsonLd from "@/components/seo/AgentJsonLd";
 import BreadcrumbJsonLd from "@/components/seo/BreadcrumbJsonLd";
 
+// Render on every request so admin changes (e.g. deleting an agent) appear immediately.
+export const dynamic = "force-dynamic";
+
 type Props = {
   params: Promise<{ id: string }>;
 };

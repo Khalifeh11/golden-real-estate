@@ -9,6 +9,9 @@ import { getFeaturedProperties } from "@/lib/properties";
 import OrganizationJsonLd from "@/components/seo/OrganizationJsonLd";
 import WebSiteJsonLd from "@/components/seo/WebSiteJsonLd";
 
+// Render on every request so admin changes (e.g. featuring a property) appear immediately.
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const featuredProperties = await getFeaturedProperties();
   return (

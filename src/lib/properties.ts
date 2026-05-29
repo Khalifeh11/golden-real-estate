@@ -4,6 +4,7 @@ import PropertyModel from "@/models/Property";
 import AgentModel from "@/models/Agent";
 import { propertySearchSchema } from "./validators";
 import { toPropertyCardData, toPropertyListingCardData } from "./utils";
+import { buildSearchFilter } from "./search";
 import { MIN_LISTING_DATE, OTHER_COUNTRY_VALUE, PRIMARY_COUNTRIES } from "./constants";
 import type {
   Property,
@@ -64,7 +65,8 @@ export async function searchProperties(
   }
 
   if (params.q) {
-    filter.$text = { $search: params.q };
+    const search = buildSearchFilter(params.q);
+    if (search) Object.assign(filter, search);
   }
 
   const sortMap: Record<string, Record<string, 1 | -1>> = {
@@ -74,17 +76,14 @@ export async function searchProperties(
     area_desc: { areaSqm: -1 },
   };
 
-  let sort: Record<string, 1 | -1 | { $meta: string }>;
-  if (params.q && (!params.sort || params.sort === "relevance")) {
-    sort = { score: { $meta: "textScore" } };
-  } else {
-    sort = sortMap[params.sort ?? "newest"] ?? sortMap.newest;
-  }
+  // Tokenized regex search has no relevance score, so "relevance" falls back to newest.
+  const sortKey = params.sort === "relevance" ? "newest" : params.sort ?? "newest";
+  const sort = sortMap[sortKey] ?? sortMap.newest;
 
   const skip = (params.page - 1) * params.limit;
 
   const [docs, total] = await Promise.all([
-    PropertyModel.find(filter).sort(sort as Record<string, 1 | -1 | { $meta: "textScore" }>).skip(skip).limit(params.limit).lean(),
+    PropertyModel.find(filter).sort(sort).skip(skip).limit(params.limit).lean(),
     PropertyModel.countDocuments(filter),
   ]);
 
