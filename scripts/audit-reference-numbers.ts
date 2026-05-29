@@ -1,18 +1,24 @@
 /**
  * Read-only audit: find reference-number problems that would block the
- * unique partial index on active (non-trashed) properties.
+ * unique partial index on the live catalog.
  *
  * Run: MONGODB_URI="<your connection string>" npx tsx scripts/audit-reference-numbers.ts
  *
- * Makes NO writes. Only active listings (trash !== true) are considered,
- * because the planned index is:
- *   { referenceNumber: 1 } unique, partialFilterExpression: { trash: { $ne: true } }
+ * Makes NO writes. Scope matches the index in src/models/Property.ts, which
+ * only covers listings created on/after MIN_LISTING_DATE (the pre-2022 archive
+ * of migration duplicates is intentionally excluded). The index spans ALL
+ * statuses in that window, so this audit does too (not just ACTIVE).
+ *   { referenceNumber: 1 } unique,
+ *   partialFilterExpression: { createdAt: { $gte: MIN_LISTING_DATE }, referenceNumber: { $exists: true } }
  *
  * Fix the listings it reports by hand in the admin UI, then re-run until it
- * prints "clean" before adding the index.
+ * prints "clean" before building the index.
  */
 
 import mongoose from "mongoose";
+
+// Keep in sync with MIN_LISTING_DATE in src/lib/constants.ts (and the index).
+const MIN_LISTING_DATE = new Date("2022-01-01T00:00:00.000Z");
 
 const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) {
@@ -27,7 +33,7 @@ interface PropertyRow {
   title?: string;
   slug?: string;
   referenceNumber?: string | null;
-  trash?: boolean;
+  status?: string;
   createdAt?: Date;
 }
 
@@ -37,7 +43,7 @@ function isBlank(ref: string | null | undefined): boolean {
 
 function label(p: PropertyRow): string {
   const when = p.createdAt ? new Date(p.createdAt).toISOString().slice(0, 10) : "no-date";
-  return `      ${p._id}  ${when}  "${p.title ?? "(untitled)"}"  /${p.slug ?? ""}`;
+  return `      ${p._id}  ${when}  [${p.status ?? "?"}]  "${p.title ?? "(untitled)"}"  /${p.slug ?? ""}`;
 }
 
 async function audit() {
@@ -45,11 +51,11 @@ async function audit() {
   const db = mongoose.connection.db!;
   const active = (await db
     .collection("properties")
-    .find({ trash: { $ne: true } })
-    .project({ title: 1, slug: 1, referenceNumber: 1, createdAt: 1 })
+    .find({ createdAt: { $gte: MIN_LISTING_DATE } })
+    .project({ title: 1, slug: 1, referenceNumber: 1, status: 1, createdAt: 1 })
     .toArray()) as PropertyRow[];
 
-  console.log(`\nActive (non-trashed) listings: ${active.length}\n`);
+  console.log(`\nLive listings (created >= ${MIN_LISTING_DATE.toISOString().slice(0, 10)}, all statuses): ${active.length}\n`);
 
   // 1. Blanks — missing, null, or empty/whitespace reference numbers
   const blanks = active.filter((p) => isBlank(p.referenceNumber));

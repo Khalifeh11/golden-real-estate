@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { MIN_LISTING_DATE } from "@/lib/constants";
 
 export interface IImage {
   url: string;
@@ -108,13 +109,23 @@ const PropertySchema = new Schema<IProperty>(
   { timestamps: true }
 );
 
-// Reference numbers are entered manually and must be unique — but only among
-// active listings. A partial filter on `trash` mirrors the app-level checks
-// (which all exclude trashed docs) so a soft-deleted listing's number is freed
-// for reuse and the DB never disagrees with the application.
+// Reference numbers are entered manually and must be unique — but only for the
+// live catalog (listings created on/after MIN_LISTING_DATE). The pre-2022
+// archive is full of duplicate documents left by the ApostropheCMS migration;
+// a date-scoped partial index excludes them so the index can build, while still
+// enforcing uniqueness on everything new. `$gte`/`$exists` are the operators
+// MongoDB allows in partialFilterExpression (note: `$ne` is NOT allowed).
+// NOTE: the cutoff date is baked into the index — if MIN_LISTING_DATE changes,
+// this index must be rebuilt (e.g. via scripts that call syncIndexes()).
 PropertySchema.index(
   { referenceNumber: 1 },
-  { unique: true, partialFilterExpression: { trash: { $ne: true } } }
+  {
+    unique: true,
+    partialFilterExpression: {
+      createdAt: { $gte: MIN_LISTING_DATE },
+      referenceNumber: { $exists: true },
+    },
+  }
 );
 
 PropertySchema.index(
