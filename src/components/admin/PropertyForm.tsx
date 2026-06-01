@@ -62,7 +62,7 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
 
   function cleanFormData(data: PropertyCreateData): PropertyCreateData {
     const cleaned = { ...data };
-    const numberFields = ["price", "areaSqm", "bedrooms", "bathrooms", "parkings", "yearBuilt"] as const;
+    const numberFields = ["price", "areaSqm", "bedrooms", "bathrooms", "parkings"] as const;
     for (const field of numberFields) {
       if (typeof cleaned[field] === "number" && Number.isNaN(cleaned[field])) {
         cleaned[field] = undefined;
@@ -81,27 +81,38 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
     const url = propertyId ? `/api/properties/${propertyId}` : "/api/properties";
     const method = propertyId ? "PUT" : "POST";
 
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...data, images }),
-    });
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...data, images }),
+      });
 
-    if (!res.ok) {
-      const json = await res.json();
-      const msg =
-        json.error?.formErrors?.[0] ??
-        json.error?.fieldErrors?.referenceNumber?.[0] ??
-        (typeof json.error === "string" ? json.error : null) ??
-        "Failed to save property.";
-      toast.error(msg);
+      if (!res.ok) {
+        const json = await res.json().catch(() => null);
+        const fieldErrors = json?.error?.fieldErrors as Record<string, string[]> | undefined;
+        const firstFieldError = fieldErrors
+          ? Object.entries(fieldErrors)
+              .map(([field, msgs]) => msgs?.[0] && `${field}: ${msgs[0]}`)
+              .find(Boolean)
+          : null;
+        const msg =
+          json?.error?.formErrors?.[0] ??
+          firstFieldError ??
+          (typeof json?.error === "string" ? json.error : null) ??
+          "Failed to save property.";
+        toast.error(msg);
+        return;
+      }
+
+      toast.success("Property saved successfully");
+      router.push("/admin/properties");
+      router.refresh();
+    } catch {
+      toast.error("Could not reach the server. Check your connection and try again.");
+    } finally {
       setSaving(false);
-      return;
     }
-
-    toast.success("Property saved successfully");
-    router.push("/admin/properties");
-    router.refresh();
   }
 
   return (
@@ -321,15 +332,6 @@ export default function PropertyForm({ defaultValues, propertyId }: PropertyForm
               type="number"
               min={0}
               {...register("parkings", { valueAsNumber: true })}
-              className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
-            <input
-              type="number"
-              min={1800}
-              {...register("yearBuilt", { valueAsNumber: true })}
               className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
             />
           </div>
