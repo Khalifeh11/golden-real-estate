@@ -29,12 +29,19 @@ interface TrashedContact {
 
 type Tab = "properties" | "agents" | "contacts";
 
+const TAB_TYPE: Record<Tab, string> = {
+  properties: "property",
+  agents: "agent",
+  contacts: "contact",
+};
+
 export default function AdminTrashPage() {
   const [tab, setTab] = useState<Tab>("properties");
   const [properties, setProperties] = useState<TrashedProperty[]>([]);
   const [agents, setAgents] = useState<TrashedAgent[]>([]);
   const [contacts, setContacts] = useState<TrashedContact[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetch("/api/admin/trash")
@@ -46,6 +53,12 @@ export default function AdminTrashPage() {
         setLoading(false);
       });
   }, []);
+
+  // Selection is per-tab — reset it whenever the active tab changes.
+  function selectTab(next: Tab) {
+    setTab(next);
+    setSelected(new Set());
+  }
 
   async function handleRestore(id: string, type: string) {
     const res = await fetch(`/api/admin/trash/${id}`, {
@@ -80,6 +93,60 @@ export default function AdminTrashPage() {
     if (type === "contact") setContacts((prev) => prev.filter((c) => c._id !== id));
   }
 
+  function clearTab(type: string) {
+    if (type === "property") setProperties([]);
+    if (type === "agent") setAgents([]);
+    if (type === "contact") setContacts([]);
+  }
+
+  function toggle(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAll(ids: string[], checked: boolean) {
+    setSelected(checked ? new Set(ids) : new Set());
+  }
+
+  async function handleBulkDelete(type: string) {
+    if (selected.size === 0) return;
+    const ids = [...selected];
+    if (!confirm(`Permanently delete ${ids.length} item(s)? This cannot be undone.`)) return;
+    const res = await fetch("/api/admin/trash/bulk", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type, ids }),
+    });
+    if (res.ok) {
+      ids.forEach((id) => removeItem(id, type));
+      setSelected(new Set());
+      toast.success(`${ids.length} item(s) permanently deleted`);
+    } else {
+      toast.error("Failed to delete items");
+    }
+  }
+
+  async function handleEmptyTrash(type: string, count: number) {
+    if (count === 0) return;
+    if (!confirm(`Permanently delete all ${count} item(s) in this tab? This cannot be undone.`)) return;
+    const res = await fetch("/api/admin/trash/bulk", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type, all: true }),
+    });
+    if (res.ok) {
+      clearTab(type);
+      setSelected(new Set());
+      toast.success("Trash emptied");
+    } else {
+      toast.error("Failed to empty trash");
+    }
+  }
+
   const tabs: { key: Tab; label: string; count: number }[] = [
     { key: "properties", label: "Properties", count: properties.length },
     { key: "agents", label: "Agents", count: agents.length },
@@ -99,7 +166,7 @@ export default function AdminTrashPage() {
         {tabs.map((t) => (
           <button
             key={t.key}
-            onClick={() => setTab(t.key)}
+            onClick={() => selectTab(t.key)}
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               tab === t.key
                 ? "border-gray-900 text-gray-900"
@@ -110,6 +177,25 @@ export default function AdminTrashPage() {
           </button>
         ))}
       </div>
+
+      {!loading && (
+        <div className="flex items-center gap-3 mb-3">
+          <button
+            onClick={() => handleBulkDelete(TAB_TYPE[tab])}
+            disabled={selected.size === 0}
+            className="text-xs font-medium px-3 py-1.5 rounded border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Delete {selected.size} selected
+          </button>
+          <button
+            onClick={() => handleEmptyTrash(TAB_TYPE[tab], tabs.find((t) => t.key === tab)?.count ?? 0)}
+            disabled={(tabs.find((t) => t.key === tab)?.count ?? 0) === 0}
+            className="text-xs font-medium px-3 py-1.5 rounded border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Empty trash
+          </button>
+        </div>
+      )}
 
       <div className="bg-white rounded-lg border border-gray-200">
         {loading ? (
@@ -127,6 +213,9 @@ export default function AdminTrashPage() {
                 ]}
                 onRestore={(p) => handleRestore(p._id, "property")}
                 onDelete={(p) => handleDelete(p._id, "property", p.title)}
+                selected={selected}
+                onToggle={toggle}
+                onToggleAll={(checked) => toggleAll(properties.map((p) => p._id), checked)}
                 emptyMessage="No trashed properties."
               />
             )}
@@ -141,6 +230,9 @@ export default function AdminTrashPage() {
                 ]}
                 onRestore={(a) => handleRestore(a._id, "agent")}
                 onDelete={(a) => handleDelete(a._id, "agent", `${a.firstName} ${a.lastName}`)}
+                selected={selected}
+                onToggle={toggle}
+                onToggleAll={(checked) => toggleAll(agents.map((a) => a._id), checked)}
                 emptyMessage="No trashed agents."
               />
             )}
@@ -155,6 +247,9 @@ export default function AdminTrashPage() {
                 ]}
                 onRestore={(c) => handleRestore(c._id, "contact")}
                 onDelete={(c) => handleDelete(c._id, "contact", c.name)}
+                selected={selected}
+                onToggle={toggle}
+                onToggleAll={(checked) => toggleAll(contacts.map((c) => c._id), checked)}
                 emptyMessage="No trashed contacts."
               />
             )}
@@ -171,6 +266,9 @@ function TrashTable<T extends { _id: string }>({
   renderRow,
   onRestore,
   onDelete,
+  selected,
+  onToggle,
+  onToggleAll,
   emptyMessage,
 }: {
   items: T[];
@@ -178,16 +276,29 @@ function TrashTable<T extends { _id: string }>({
   renderRow: (item: T) => string[];
   onRestore: (item: T) => void;
   onDelete: (item: T) => void;
+  selected: Set<string>;
+  onToggle: (id: string) => void;
+  onToggleAll: (checked: boolean) => void;
   emptyMessage: string;
 }) {
   if (items.length === 0) {
     return <p className="text-center text-gray-400 py-12">{emptyMessage}</p>;
   }
 
+  const allSelected = items.every((item) => selected.has(item._id));
+
   return (
     <table className="w-full text-sm text-left">
       <thead className="bg-gray-50 border-b border-gray-200">
         <tr>
+          <th className="px-4 py-3 w-10">
+            <input
+              type="checkbox"
+              checked={allSelected}
+              onChange={(e) => onToggleAll(e.target.checked)}
+              aria-label="Select all"
+            />
+          </th>
           {columns.map((col) => (
             <th key={col} className="px-4 py-3 font-medium text-gray-600">{col}</th>
           ))}
@@ -199,6 +310,14 @@ function TrashTable<T extends { _id: string }>({
           const cells = renderRow(item);
           return (
             <tr key={item._id} className="hover:bg-gray-50">
+              <td className="px-4 py-3">
+                <input
+                  type="checkbox"
+                  checked={selected.has(item._id)}
+                  onChange={() => onToggle(item._id)}
+                  aria-label="Select row"
+                />
+              </td>
               {cells.map((cell, i) => (
                 <td key={i} className="px-4 py-3 text-gray-700">{cell}</td>
               ))}
