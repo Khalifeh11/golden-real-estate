@@ -7,9 +7,9 @@ import { MdMenu, MdClose } from "react-icons/md";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/about", label: "About Us" },
   { href: "/properties", label: "Properties" },
   { href: "/agents", label: "Agents" },
+  { href: "/about", label: "About Us" },
   { href: "/contact", label: "Contact Us" },
 ];
 
