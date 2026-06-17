@@ -1,12 +1,9 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { Agent } from "@/types";
 import { agentFullName } from "@/lib/utils";
 
 interface AgentCardProps {
   agent: Agent;
-  /** When true, the card header links to the agent profile page */
-  linkToProfile?: boolean;
 }
 
 function AgentInitials({ agent }: { agent: Agent }) {
@@ -23,7 +20,7 @@ function formatWhatsAppUrl(phone: string) {
   return `https://wa.me/${digits.replace("+", "")}`;
 }
 
-export default function AgentCard({ agent, linkToProfile }: AgentCardProps) {
+export default function AgentCard({ agent }: AgentCardProps) {
   const fullName = agentFullName(agent.firstName, agent.lastName);
 
   const header = (
@@ -52,13 +49,7 @@ export default function AgentCard({ agent, linkToProfile }: AgentCardProps) {
 
   return (
     <div className="bg-surface-container-lowest p-8 rounded-xl shadow-xl shadow-black/5 border border-outline-variant/10 flex flex-col">
-      {linkToProfile ? (
-        <Link href={`/agents/${agent._id}`} className="block hover:opacity-80 transition-opacity">
-          {header}
-        </Link>
-      ) : (
-        header
-      )}
+      {header}
 
       {agent.bio && (
         <p className="text-on-surface-variant text-sm leading-relaxed">
@@ -96,6 +87,20 @@ export default function AgentCard({ agent, linkToProfile }: AgentCardProps) {
               Call Agent
             </a>
           </>
+        )}
+        {agent.email && (
+          <a
+            href={`mailto:${agent.email}`}
+            className="flex items-center justify-center gap-2 bg-surface-container-high text-on-surface py-3 rounded-lg font-bold hover:brightness-95 transition-all border border-outline-variant/30"
+          >
+            <span
+              className="material-symbols-outlined"
+              style={{ fontVariationSettings: "'FILL' 1" }}
+            >
+              mail
+            </span>
+            Email
+          </a>
         )}
       </div>
     </div>
