@@ -179,17 +179,42 @@ async function _getAgentById(agentId: string): Promise<Agent | null> {
 /** Request-level cached version — safe to call from generateMetadata + page */
 export const getAgentById = cache(_getAgentById);
 
-export async function getPropertiesByAgentId(agentId: string): Promise<PropertyCardData[]> {
+export const AGENT_LISTINGS_PAGE_SIZE = 24;
+
+export type AgentListingsPage = {
+  properties: PropertyCardData[];
+  total: number;
+  page: number;
+  totalPages: number;
+};
+
+export async function getPropertiesByAgentId(
+  agentId: string,
+  page = 1,
+): Promise<AgentListingsPage> {
   await dbConnect();
-  const docs = await PropertyModel.find({
+  const filter = {
     agentId,
     status: "ACTIVE",
     trash: { $ne: true },
     createdAt: { $gte: MIN_LISTING_DATE },
-  })
+  };
+  const total = await PropertyModel.countDocuments(filter);
+  const totalPages = Math.max(1, Math.ceil(total / AGENT_LISTINGS_PAGE_SIZE));
+  // Clamp into [1, totalPages] so an out-of-range ?page= lands on the last page
+  // (a real listings grid) rather than an empty one with total > 0.
+  const safePage = Math.min(Math.max(1, Math.floor(page) || 1), totalPages);
+  const docs = await PropertyModel.find(filter)
     .sort({ createdAt: -1 })
+    .skip((safePage - 1) * AGENT_LISTINGS_PAGE_SIZE)
+    .limit(AGENT_LISTINGS_PAGE_SIZE)
     .lean();
-  return (docs as unknown as Property[]).map(toPropertyCardData);
+  return {
+    properties: (docs as unknown as Property[]).map(toPropertyCardData),
+    total,
+    page: safePage,
+    totalPages,
+  };
 }
 
 export async function getSimilarProperties(

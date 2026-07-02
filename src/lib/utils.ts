@@ -40,6 +40,12 @@ export function agentFullName(firstName: string, lastName: string): string {
   return `${firstName} ${lastName}`.trim();
 }
 
+/** Build a wa.me deep link from a raw phone string. */
+export function formatWhatsAppUrl(phone: string): string {
+  const digits = phone.replace(/[^\d+]/g, "");
+  return `https://wa.me/${digits.replace("+", "")}`;
+}
+
 /** Category label: "FOR_SALE" → "For Sale" */
 export function categoryLabel(category: string): string {
   return category

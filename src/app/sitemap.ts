@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import dbConnect from "@/lib/mongodb";
 import PropertyModel from "@/models/Property";
+import AgentModel from "@/models/Agent";
 import { MIN_LISTING_DATE } from "@/lib/constants";
 
 const BASE_URL =
@@ -9,13 +10,16 @@ const BASE_URL =
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   await dbConnect();
 
-  const properties = await PropertyModel.find({
-    status: "ACTIVE",
-    trash: false,
-    createdAt: { $gte: MIN_LISTING_DATE },
-  })
-    .select("slug updatedAt")
-    .lean();
+  const [properties, agents] = await Promise.all([
+    PropertyModel.find({
+      status: "ACTIVE",
+      trash: { $ne: true },
+      createdAt: { $gte: MIN_LISTING_DATE },
+    })
+      .select("slug updatedAt")
+      .lean(),
+    AgentModel.find({ trash: { $ne: true } }).select("_id updatedAt").lean(),
+  ]);
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
@@ -57,5 +61,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticRoutes, ...propertyRoutes];
+  const agentRoutes: MetadataRoute.Sitemap = agents.map((a) => ({
+    url: `${BASE_URL}/agents/${a._id}`,
+    lastModified: a.updatedAt,
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
+  return [...staticRoutes, ...propertyRoutes, ...agentRoutes];
 }
