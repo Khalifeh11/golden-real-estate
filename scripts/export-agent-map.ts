@@ -30,7 +30,7 @@ async function run() {
     .filter((d) => typeof d.agentId === "string" && d.agentId.trim())
     .map((d) => ({ _id: String(d._id), agentId: String(d.agentId).trim() }));
 
-  writeFileSync(MAP_FILE, JSON.stringify(map, null, 0));
+  writeFileSync(MAP_FILE!, JSON.stringify(map, null, 0));
   console.log(`Exported ${map.length} property→agent links to ${MAP_FILE}`);
   console.log(`Distinct agents in map: ${new Set(map.map((m) => m.agentId)).size}`);
   await mongoose.disconnect();

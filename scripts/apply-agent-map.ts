@@ -35,7 +35,7 @@ const AGENT_REMAP: Record<string, string> = {
 };
 
 async function run() {
-  const map: MapEntry[] = JSON.parse(readFileSync(MAP_FILE, "utf8"));
+  const map: MapEntry[] = JSON.parse(readFileSync(MAP_FILE!, "utf8"));
   console.log(`Loaded ${map.length} mapped links from ${MAP_FILE}`);
 
   await mongoose.connect(MONGODB_URI!);
