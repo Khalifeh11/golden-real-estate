@@ -96,6 +96,7 @@ export async function GET(request: NextRequest) {
   const sortParam = searchParams.get("sort") ?? "newest";
   const sortMap: Record<string, Record<string, 1 | -1>> = {
     newest: { createdAt: -1 },
+    modified: { updatedAt: -1 },
     price_asc: { price: 1 },
     price_desc: { price: -1 },
     area_desc: { areaSqm: -1 },

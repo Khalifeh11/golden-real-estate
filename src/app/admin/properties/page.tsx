@@ -6,7 +6,7 @@ import Link from "next/link";
 import PropertyTable from "@/components/admin/PropertyTable";
 import type { Property } from "@/types";
 import { useSession } from "next-auth/react";
-import { CATEGORIES, PROPERTY_GROUPS } from "@/lib/constants";
+import { ADMIN_SORT_OPTIONS, CATEGORIES, PROPERTY_GROUPS } from "@/lib/constants";
 
 export default function AdminPropertiesPage() {
   const { data: session } = useSession();
@@ -19,6 +19,7 @@ export default function AdminPropertiesPage() {
   const [propertyGroup, setPropertyGroup] = useState("");
   const [country, setCountry] = useState("");
   const [scope, setScope] = useState<"recent" | "archived" | "all">("recent");
+  const [sort, setSort] = useState("modified");
   const [countries, setCountries] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -44,6 +45,7 @@ export default function AdminPropertiesPage() {
     if (propertyGroup) params.set("propertyGroup", propertyGroup);
     if (country) params.set("country", country);
     if (scope !== "recent") params.set("scope", scope);
+    params.set("sort", sort);
 
     fetch(`/api/properties?${params}`)
       .then((res) => res.json())
@@ -56,7 +58,7 @@ export default function AdminPropertiesPage() {
       });
 
     return () => { cancelled = true; };
-  }, [page, search, status, category, propertyGroup, country, scope]);
+  }, [page, search, status, category, propertyGroup, country, scope, sort]);
 
   async function handleStatusChange(id: string, newStatus: string) {
     const res = await fetch(`/api/properties/${id}/status`, {
@@ -187,6 +189,15 @@ export default function AdminPropertiesPage() {
           <option value="">All countries</option>
           {countries.map((c) => (
             <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+        <select
+          value={sort}
+          onChange={(e) => { setSort(e.target.value); setPage(1); }}
+          className="border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+        >
+          {ADMIN_SORT_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
       </div>
