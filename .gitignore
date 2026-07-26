@@ -40,6 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# invoices (financial docs, kept locally)
+INVOICE-*
+
 # database files
 database files/
 goldenland-db/
