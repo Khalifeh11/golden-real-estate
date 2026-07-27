@@ -16,8 +16,13 @@ export async function GET(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  // Increment views (fire and forget)
-  Property.updateOne({ _id: property._id }, { $inc: { views: 1 } }).exec();
+  // Increment views (fire and forget). timestamps:false keeps a view from
+  // re-stamping updatedAt, which the public catalog sorts on.
+  Property.updateOne(
+    { _id: property._id },
+    { $inc: { views: 1 } },
+    { timestamps: false }
+  ).exec();
 
   return NextResponse.json(property);
 }
