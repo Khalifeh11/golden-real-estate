@@ -49,8 +49,9 @@ export async function GET(request: NextRequest) {
   const session = await auth();
   const isAdmin = session?.user?.role && ["ADMIN", "AGENT"].includes(session.user.role);
   const status = searchParams.get("status");
-  if (isAdmin && status) {
-    filter.status = status;
+  if (isAdmin) {
+    // Admins see every status; only narrow when they explicitly pick one.
+    if (status) filter.status = status;
   } else {
     filter.status = "ACTIVE";
   }
