@@ -109,6 +109,10 @@ const PropertySchema = new Schema<IProperty>(
   { timestamps: true }
 );
 
+// Public listings filter on status and default-sort by updatedAt
+// ("Recently Updated" — edits surface a listing back to the top).
+PropertySchema.index({ status: 1, updatedAt: -1 });
+
 // Reference numbers are entered manually and must be unique — but only for the
 // live catalog (listings created on/after MIN_LISTING_DATE). The pre-2022
 // archive is full of duplicate documents left by the ApostropheCMS migration;

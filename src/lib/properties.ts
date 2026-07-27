@@ -70,7 +70,7 @@ export async function searchProperties(
   }
 
   const sortMap: Record<string, Record<string, 1 | -1>> = {
-    newest: { createdAt: -1 },
+    newest: { updatedAt: -1 },
     price_asc: { price: 1 },
     price_desc: { price: -1 },
     area_desc: { areaSqm: -1 },
@@ -140,7 +140,7 @@ export async function getFeaturedProperties(limit = 6): Promise<PropertyCardData
     createdAt: { $gte: MIN_LISTING_DATE },
     isFeatured: true,
   })
-    .sort({ createdAt: -1 })
+    .sort({ updatedAt: -1 })
     .limit(limit)
     .lean();
   return (docs as unknown as Property[]).map(toPropertyCardData);
@@ -205,7 +205,7 @@ export async function getPropertiesByAgentId(
   // (a real listings grid) rather than an empty one with total > 0.
   const safePage = Math.min(Math.max(1, Math.floor(page) || 1), totalPages);
   const docs = await PropertyModel.find(filter)
-    .sort({ createdAt: -1 })
+    .sort({ updatedAt: -1 })
     .skip((safePage - 1) * AGENT_LISTINGS_PAGE_SIZE)
     .limit(AGENT_LISTINGS_PAGE_SIZE)
     .lean();
