@@ -8,12 +8,14 @@ import Pagination from "@/components/Pagination";
 import SortDropdown from "@/components/SortDropdown";
 import { searchProperties, getFilterOptions } from "@/lib/properties";
 import type { Metadata } from "next";
+import { OG_DEFAULTS } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Properties | Golden Land Real Estate",
   description:
     "Browse thousands of properties for sale and rent across Lebanon, Cyprus, Greece, and more. Apartments, villas, land, and commercial spaces.",
   openGraph: {
+    ...OG_DEFAULTS,
     title: "Properties | Golden Land Real Estate",
     description:
       "Browse thousands of properties for sale and rent across Lebanon, Cyprus, Greece, and more. Apartments, villas, land, and commercial spaces.",

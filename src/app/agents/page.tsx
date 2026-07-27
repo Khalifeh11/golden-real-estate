@@ -6,6 +6,7 @@ import AgentCard from "@/components/AgentCard";
 import { getAgents } from "@/lib/properties";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { OG_DEFAULTS } from "@/lib/seo";
 
 // Render on every request so admin changes (add/edit/delete agents) appear immediately.
 export const dynamic = "force-dynamic";
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
   description:
     "Dedicated professionals guiding you to your perfect property with local expertise and editorial precision.",
   openGraph: {
+    ...OG_DEFAULTS,
     title: "Meet Our Advisors | Golden Land Real Estate",
     description:
       "Dedicated professionals guiding you to your perfect property with local expertise and editorial precision.",

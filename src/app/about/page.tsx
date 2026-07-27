@@ -4,12 +4,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import type { Metadata } from "next";
+import { OG_DEFAULTS } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "About Us | Golden Land Real Estate",
   description:
     "Golden Land Real Estate — a trusted Mediterranean property company since 2010. Discover our heritage, values, and the markets we serve.",
   openGraph: {
+    ...OG_DEFAULTS,
     title: "About Us | Golden Land Real Estate",
     description:
       "Golden Land Real Estate — a trusted Mediterranean property company since 2010. Discover our heritage, values, and the markets we serve.",

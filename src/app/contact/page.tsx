@@ -4,12 +4,14 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import InquiryForm from "@/components/InquiryForm";
 import type { Metadata } from "next";
+import { OG_DEFAULTS } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Contact Us | Golden Land Real Estate",
   description:
     "Get in touch with Golden Land Real Estate for a private consultation or to explore our exclusive portfolio of Mediterranean properties in Lebanon, Cyprus, and Greece.",
   openGraph: {
+    ...OG_DEFAULTS,
     title: "Contact Us | Golden Land Real Estate",
     description:
       "Get in touch with Golden Land Real Estate for a private consultation or to explore our exclusive portfolio of Mediterranean properties in Lebanon, Cyprus, and Greece.",

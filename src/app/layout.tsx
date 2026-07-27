@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Manrope } from "next/font/google";
 import Providers from "@/components/Providers";
 import ToasterProvider from "@/components/ToasterProvider";
+import { OG_DEFAULTS, SITE_NAME, SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
 const inter = Inter({
@@ -14,13 +15,19 @@ const manrope = Manrope({
   subsets: ["latin"],
 });
 
+const SITE_DESCRIPTION =
+  "Discover premium properties across Lebanon, Cyprus, and Greece. Golden Land Real Estate — your trusted partner in finding the perfect home.";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://goldenlandrealestate.net",
-  ),
-  title: "Golden Land Real Estate",
-  description:
-    "Discover premium properties across Lebanon, Cyprus, and Greece. Golden Land Real Estate — your trusted partner in finding the perfect home.",
+  metadataBase: new URL(SITE_URL),
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    ...OG_DEFAULTS,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    url: "/",
+  },
 };
 
 export default function RootLayout({

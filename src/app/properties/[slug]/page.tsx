@@ -12,6 +12,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import PropertyJsonLd from "@/components/seo/PropertyJsonLd";
 import BreadcrumbJsonLd from "@/components/seo/BreadcrumbJsonLd";
 import sanitizeHtml from "sanitize-html";
+import { OG_DEFAULTS } from "@/lib/seo";
 
 // Render on every request so admin edits/deletes appear immediately.
 export const dynamic = "force-dynamic";
@@ -50,6 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     openGraph: {
+      ...OG_DEFAULTS,
       title,
       description,
       type: "website",

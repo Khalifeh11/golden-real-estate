@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import AgentJsonLd from "@/components/seo/AgentJsonLd";
 import BreadcrumbJsonLd from "@/components/seo/BreadcrumbJsonLd";
+import { OG_DEFAULTS } from "@/lib/seo";
 
 // Render on every request so admin changes (e.g. deleting an agent) appear immediately.
 export const dynamic = "force-dynamic";
@@ -38,6 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     openGraph: {
+      ...OG_DEFAULTS,
       title,
       description,
       type: "profile",
